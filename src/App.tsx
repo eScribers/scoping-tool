@@ -88,7 +88,7 @@ function App() {
   }, [ref.current]);
 
   const loadFile = async () => {
-    const file = await fetch('/transcripts/36939240-df53-4e05-b1e5-d450980e3a34-adapted_20220509_223453_08sa_4c088156.json');
+    const file = await fetch('/transcripts/test_transcript.json');
     const text = await file.json();
     const converted = text.DocumentParts.map((sentence:Sentence) => (
       {
