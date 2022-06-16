@@ -11,6 +11,8 @@ import {
     DownloadOutlined
 } from "@ant-design/icons";
 import './App.scss'
+import _ from "lodash"
+import {createCache, useCache} from '@react-hook/cache'
 
 interface Word {
     ConfidenceLevel: number | null;
@@ -33,13 +35,63 @@ const footPedalVendorId = 0x05F3;
 const footPedalProductId = 0x00FF;
 
 
+const fetchCache = createCache(async (key, options) => {
+    console.log("Fetching", key);
+    const response = await fetch(key, options);
+    return response.json();
+  }, 10);
+
 function App() {
     const [transcriptFile, setTranscriptFile] = useState<Sentence[]>([]);
+    const cloneTranscript = useRef<Sentence[]>([])
+    const [test,setTest]= useState<Sentence[]>([])
     const [playHead, setPlayHead] = useState<number>(0);
     const ref = useRef<HTMLAudioElement>(null);
     const [device, setDevice] = useState<any>(null);
     const [isPlay, setPlay] = useState<boolean>(false)
     const [isVolume, setVolume] = useState<boolean>(false)
+    const [sliders, setSliders] = useState<number[]>([0, 0, 0, 0]);
+    const [showSliders, setShowSliders] = useState<boolean>(false);
+    
+    const [{ status, value, error, cancel }, fetchData] = useCache(
+        fetchCache,
+        `/transcripts/36939240-df53-4e05-b1e5-d450980e3a34-adapted_20220509_223453_08sa_4c088156.json`,
+        []
+      );
+
+
+      useEffect(() => {
+        if (status === "idle") {
+            fetchData();
+        }
+      }, [fetchData, status]);
+
+      useEffect(()=>{
+    
+        if(value){
+            const converted = value.DocumentParts.map((sentence: Sentence) => (
+                {
+                    ...sentence,
+                    Words: sentence.Words.map((word: Word) => ({
+                        ...word,
+                        TimeRange: !word.TimeRange ? null : {
+                            StartTime: moment.duration(word.TimeRange.StartTime).asSeconds(),
+                            EndTime: moment.duration(word.TimeRange.EndTime).asSeconds(),
+                        }
+                    }))
+                }
+            ))
+            const localFile = window.localStorage.getItem('transcript')
+        
+    
+            setTranscriptFile(converted);
+    
+            
+            cloneTranscript.current = converted
+        }
+      
+
+      },[value])
 
 
     const getDevices = async () => {
@@ -71,6 +123,7 @@ function App() {
             });
         })
         document.addEventListener("contextmenu", e => e.preventDefault());
+        
     }, [])
 
     useEffect(() => {
@@ -103,31 +156,16 @@ function App() {
         });
     }, [ref.current]);
 
-    const loadFile = async () => {
-        const file = await fetch('/transcripts/36939240-df53-4e05-b1e5-d450980e3a34-adapted_20220509_223453_08sa_4c088156.json');
-        const text = await file.json();
-        const converted = text.DocumentParts.map((sentence: Sentence) => (
-            {
-                ...sentence,
-                Words: sentence.Words.map((word: Word) => ({
-                    ...word,
-                    TimeRange: !word.TimeRange ? null : {
-                        StartTime: moment.duration(word.TimeRange.StartTime).asSeconds(),
-                        EndTime: moment.duration(word.TimeRange.EndTime).asSeconds(),
-                    }
-                }))
-            }
-        ))
-        setTranscriptFile(converted);
-    }
-
-    useEffect(() => {
-        loadFile();
-    }, []);
 
     const saveFileToText = () => {
 
-        const text: string = transcriptFile.reduce((acc: string, sentence: Sentence) => {
+        let tFile = _.cloneDeep(transcriptFile)
+
+        if(cloneTranscript.current.length > 0) {
+            tFile = _.cloneDeep(cloneTranscript.current)
+        }
+
+        const text: string = tFile.reduce((acc: string, sentence: Sentence) => {
             let next = acc + sentence.NameSpeaker + ':'
             const words = sentence.Words.reduce((acc: string, word: Word) => acc + word.Text, "")
             return next + words + '\n';
@@ -179,6 +217,24 @@ function App() {
         setPlay(!isPlay)
     }
 
+    const onChangeWord = (word: string | null, sIndex:number, wordIndex:number)=> {
+
+        const updateTranscriptFile = _.cloneDeep(cloneTranscript.current)
+
+        if(word === null) {
+            return null
+        }
+        
+        updateTranscriptFile[sIndex].Words[wordIndex].Text = word
+        
+        cloneTranscript.current = updateTranscriptFile
+        setTest(updateTranscriptFile)
+        
+        console.log(cloneTranscript.current);
+        
+    } 
+
+
 
     if (!transcriptFile.length) return null;
 
@@ -205,7 +261,9 @@ function App() {
 
                   return (
                       <span id={`sentence_${s_index}_word_${index}`} key={index}
-                            style={isInTimeRange ? {background: 'yellow'} : {}} contentEditable
+                            style={isInTimeRange ? {background: 'yellow'} : {}}
+                            contentEditable
+                            onInput={(e)=> onChangeWord(e.currentTarget.textContent,s_index,index)}
                             dangerouslySetInnerHTML={{__html: word.Text}}/>
                   )
               })}
@@ -214,6 +272,28 @@ function App() {
                 );
             })}
             <div className="controls">
+            <button onClick={() => setShowSliders(!showSliders)}>{showSliders ? 'Hide' : 'Show'} Sliders</button>
+            {showSliders && (
+                <>
+                {sliders.map((slider: number, index: number) => {
+                                return (
+                                    <input type="range" key={index}
+                                            value={slider}
+                                            className="vranger"
+                                            onChange={(e) => {
+                                                const newSliders = [...sliders];
+                                                newSliders[index] = Number(e.currentTarget.value);
+                                                setSliders(newSliders);
+                                            }
+                                            }
+                                    /> 
+                                    
+                                )
+                            }
+                            )}
+                </>
+            )}
+            
 
                 <div style={{display: 'none'}}>
                     <div className="player">

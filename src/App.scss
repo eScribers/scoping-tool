@@ -23,6 +23,12 @@
   align-items: center;
 }
 
+.vranger {
+  margin-top: 50px;
+   transform: rotate(270deg);
+  -moz-transform: rotate(270deg); /*do same for other browsers if required*/
+}
+
 .player-controls {
   display: flex;
   gap: 10px;
