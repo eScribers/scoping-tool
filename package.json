@@ -10,8 +10,9 @@
   },
   "dependencies": {
     "@ant-design/icons": "^4.7.0",
-    "@react-hook/cache": "^1.1.1",
+    "@react-hook/copy": "^2.0.1",
     "@types/lodash": "^4.14.182",
+    "antd": "^4.21.2",
     "howler": "^2.2.3",
     "lodash": "^4.17.21",
     "moment": "^2.29.3",

@@ -1,0 +1,37 @@
+.audio-progress-bar {
+  background: #fff;
+  height: 80px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  .ant-slider{
+    width: 500px;
+    max-width: calc(100% - 140px);
+    margin: 0 70px;
+    height: 24px;
+  }
+  .ant-slider-rail{
+    height: 15px;
+    background: #f0f0f0;
+  }
+
+  .ant-slider-dot{
+    display: none;
+  }
+
+  .ant-slider-mark{
+    //top: -16px;
+    .ant-slider-mark-text:nth-child(1) {
+      transform: translateX(-100%) !important;
+    }
+    .ant-slider-mark-text:nth-child(2) {
+      transform: translateX(0) !important;
+    }
+  }
+}
+
+.progress-bar-tooltip{
+  position: absolute;
+  z-index: 1070;
+  color: #c4c4c4;
+}
