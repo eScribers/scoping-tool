@@ -27,7 +27,7 @@ const ChanelControl = () => {
 
     return (
         <Popover content={ChanelSliders} trigger='click' placement="bottom">
-            <Button size='large'>Chanels</Button>
+            <Button size='large'>Channels</Button>
         </Popover>
     )
 }

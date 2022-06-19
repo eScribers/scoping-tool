@@ -5,6 +5,7 @@ import CopyBtn from "../ScoopingButtons/CopyBtn";
 import DownloadWord from "../ScoopingButtons/DownloadWord";
 import DownloadPDF from "../ScoopingButtons/DownloadPDF";
 import _ from "lodash";
+import axios from "axios";
 import moment from "moment";
 
 const {Title, Paragraph, Text} = Typography
@@ -13,12 +14,31 @@ interface TranscriptFileInterface {
     playHead: number
 }
 
+interface TranscriptChangesInterface {
+    sIndex: number,
+    wIndex: number,
+    word: String,
+    newWord: String
+}
+
 const textContainerStyle: CSSProperties = {
     flex: 1,
     overflowY: 'scroll'
 }
 
 const TranscriptFile: FC<TranscriptFileInterface> = ({playHead}) => {
+    const [transcriptChanges, setTranscriptChanges] = useState<TranscriptChangesInterface[]>([ 
+        {
+        sIndex: 2,
+        wIndex: 3,
+        word: "Sam",
+        newWord: "new test word"
+    }, {
+        sIndex: 2,
+        wIndex: 4,
+        word: "How",
+        newWord: "new test word2"}
+    ]);
     const [transcriptFile, setTranscriptFile] = useState<SentenceInterface[]>([]);
     const textContainerRef = useRef<HTMLDivElement>(null)
 
@@ -44,7 +64,14 @@ const TranscriptFile: FC<TranscriptFileInterface> = ({playHead}) => {
         loadFile();
     }, []);
 
-
+    const sendChanges = async () => {
+        const response = await axios.post(
+            'https://example.com',
+            { payload: transcriptChanges },
+            { headers: { 'Content-Type': 'application/json' } }
+        )
+        console.log(response.data)
+    }
     const onChangeWord = (oldword: string, word: string | null, sIndex: number, wordIndex: number) => {
 
         if (word === null || oldword === word) {
@@ -52,10 +79,34 @@ const TranscriptFile: FC<TranscriptFileInterface> = ({playHead}) => {
 
         }
         const updateTranscriptFile = _.cloneDeep(transcriptFile)
-
         updateTranscriptFile[sIndex].Words[wordIndex].Text = word
 
-        setTranscriptFile(updateTranscriptFile)
+
+
+        console.log(sIndex, wordIndex, word, oldword);
+        // if object doesn't exist, add it to the array:
+        const indexOfChangeState = transcriptChanges.findIndex((obj: TranscriptChangesInterface) => obj.sIndex === sIndex && obj.wIndex === wordIndex)
+        if (indexOfChangeState === -1) {
+            var newObj = { sIndex: sIndex, wIndex: wordIndex,word: oldword, newWord: word}
+            console.log(newObj);
+            setTranscriptChanges((transcriptChanges) => [...transcriptChanges, newObj])
+        }
+        // else object exist and we need to update it:
+        else {
+            const newTranscriptChanges = _.cloneDeep(transcriptChanges)
+            newTranscriptChanges[indexOfChangeState].newWord = word
+            setTranscriptChanges(newTranscriptChanges)
+        }
+        // if we have more than 20 object in transcriptChanges, send an api request to update the db:
+        if (transcriptChanges.length > 20) {
+            console.log("sending request to update db");
+             // create a new request
+             sendChanges();
+                // clear the array
+            setTranscriptChanges([])
+        }
+
+        console.log(transcriptChanges);
         console.log(word)
     }
 
