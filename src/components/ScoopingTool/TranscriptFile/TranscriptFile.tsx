@@ -27,17 +27,18 @@ const textContainerStyle: CSSProperties = {
 }
 
 const TranscriptFile: FC<TranscriptFileInterface> = ({playHead}) => {
-    const [transcriptChanges, setTranscriptChanges] = useState<TranscriptChangesInterface[]>([ 
+    const [transcriptChanges, setTranscriptChanges] = useState<TranscriptChangesInterface[]>([
         {
-        sIndex: 2,
-        wIndex: 3,
-        word: "Sam",
-        newWord: "new test word"
-    }, {
-        sIndex: 2,
-        wIndex: 4,
-        word: "How",
-        newWord: "new test word2"}
+            sIndex: 2,
+            wIndex: 3,
+            word: "Sam",
+            newWord: "new test word"
+        }, {
+            sIndex: 2,
+            wIndex: 4,
+            word: "How",
+            newWord: "new test word2"
+        }
     ]);
     const [transcriptFile, setTranscriptFile] = useState<SentenceInterface[]>([]);
     const textContainerRef = useRef<HTMLDivElement>(null)
@@ -67,8 +68,8 @@ const TranscriptFile: FC<TranscriptFileInterface> = ({playHead}) => {
     const sendChanges = async () => {
         const response = await axios.post(
             'https://example.com',
-            { payload: transcriptChanges },
-            { headers: { 'Content-Type': 'application/json' } }
+            {payload: transcriptChanges},
+            {headers: {'Content-Type': 'application/json'}}
         )
         console.log(response.data)
     }
@@ -76,18 +77,13 @@ const TranscriptFile: FC<TranscriptFileInterface> = ({playHead}) => {
 
         if (word === null || oldword === word) {
             return false
-
         }
-        const updateTranscriptFile = _.cloneDeep(transcriptFile)
-        updateTranscriptFile[sIndex].Words[wordIndex].Text = word
-
-
 
         console.log(sIndex, wordIndex, word, oldword);
         // if object doesn't exist, add it to the array:
         const indexOfChangeState = transcriptChanges.findIndex((obj: TranscriptChangesInterface) => obj.sIndex === sIndex && obj.wIndex === wordIndex)
         if (indexOfChangeState === -1) {
-            var newObj = { sIndex: sIndex, wIndex: wordIndex,word: oldword, newWord: word}
+            var newObj = {sIndex: sIndex, wIndex: wordIndex, word: oldword, newWord: word}
             console.log(newObj);
             setTranscriptChanges((transcriptChanges) => [...transcriptChanges, newObj])
         }
@@ -100,9 +96,9 @@ const TranscriptFile: FC<TranscriptFileInterface> = ({playHead}) => {
         // if we have more than 20 object in transcriptChanges, send an api request to update the db:
         if (transcriptChanges.length > 20) {
             console.log("sending request to update db");
-             // create a new request
-             sendChanges();
-                // clear the array
+            // create a new request
+            sendChanges();
+            // clear the array
             setTranscriptChanges([])
         }
 
@@ -132,8 +128,8 @@ const TranscriptFile: FC<TranscriptFileInterface> = ({playHead}) => {
                     {transcriptFile.map((sentence: SentenceInterface, s_index: number) => {
                         return (
                             <div key={s_index}>
-                                <Title style={{textAlign: "center"}} level={4}>{sentence.NameSpeaker}</Title>
-                                <Paragraph>&nbsp;—&nbsp;
+                                <Title level={4}>{sentence.NameSpeaker}</Title>
+                                <Paragraph>
                                     {sentence.Words.map((word: WordInterface, index: number) => {
                                         // Check if the word is in the current time range
                                         let isInTimeRange = null;
