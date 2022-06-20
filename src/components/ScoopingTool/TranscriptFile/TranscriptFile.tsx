@@ -15,11 +15,11 @@ interface TranscriptFileInterface {
 }
 
 interface TranscriptChangesInterface {
-    action: string,
+    action: String,
     sIndex: number,
     wIndex: number,
     word: String,
-    newWord: String
+    newWord: String | null
 }
 
 const textContainerStyle: CSSProperties = {
@@ -29,25 +29,6 @@ const textContainerStyle: CSSProperties = {
 
 const TranscriptFile: FC<TranscriptFileInterface> = ({playHead}) => {
     const [transcriptChanges, setTranscriptChanges] = useState<TranscriptChangesInterface[]>([
-        {
-            action: 'replace',
-            sIndex: 2,
-            wIndex: 3,
-            word: "Sam",
-            newWord: "new test word"
-        }, {
-            action: 'add',
-            sIndex: 2,
-            wIndex: 4,
-            word: "",
-            newWord: "new test word2"
-        }, {
-            action: 'delete',
-            sIndex: 2,
-            wIndex: 4,
-            word: "",
-            newWord: ""
-        }
     ]);
     const [transcriptFile, setTranscriptFile] = useState<SentenceInterface[]>([]);
     const [triggerElement, setTriggerElement] = useState<string | null>(null)
@@ -82,6 +63,10 @@ const TranscriptFile: FC<TranscriptFileInterface> = ({playHead}) => {
         }
     }, [triggerElement])
 
+    useEffect(() => {
+        console.log(transcriptChanges)
+    }, [transcriptChanges])
+
     const sendChanges = async () => {
         const response = await axios.post(
             'https://example.com',
@@ -92,24 +77,67 @@ const TranscriptFile: FC<TranscriptFileInterface> = ({playHead}) => {
     }
 
 
-    const handleTranscriptChanges = (oldword: string, word: string | null, sIndex: number, wordIndex: number) => { 
 
-        const indexOfChangeState = transcriptChanges.findIndex((obj: TranscriptChangesInterface) => obj.sIndex === sIndex && obj.wIndex === wordIndex)
-        if (indexOfChangeState === -1) {
-            const IsNew = transcriptFile[sIndex].Words[wordIndex].IsNewWord
-            var newObj = {sIndex: sIndex, wIndex: wordIndex, word: oldword, newWord: word, action: IsNew ? 'add' : 'replace'}
-            setTranscriptChanges((transcriptChanges) => [...transcriptChanges, newObj])
-        }
-        // else object exist and we need to update it:
-        else {
-            const newTranscriptChanges = _.cloneDeep(transcriptChanges)
-            newTranscriptChanges[indexOfChangeState].newWord = word
-            setTranscriptChanges(newTranscriptChanges)
-        }
 
+    
+    const handleTranscriptChanges = (oldword: string, word: string, sIndex: number, wordIndex: number) => { 
+        //if sIndex and sIndex equel to current object.sIndex and object.wIndex in transcriptChanges then update the word:
+        const transcriptChange = transcriptChanges.find((change: TranscriptChangesInterface) => (
+            change.sIndex === sIndex && change.wIndex === wordIndex +1
+        ))
+
+        console.log(transcriptChange)
+        if (transcriptChange) {
+            if (word === '') {
+                //if word is null then we edit the action in our transcriptChanges object to remove:
+                setTranscriptChanges(transcriptChanges.map((change: TranscriptChangesInterface) => {
+                    if (change.sIndex === sIndex && change.wIndex === wordIndex) {
+                        return {
+                            ...change,
+                            action: 'delete'
+                        }
+                    }
+                    return change
+                }))
+            } else {
+                setTranscriptChanges(transcriptChanges.map((change: TranscriptChangesInterface) => {
+                    console.log(change)
+                    if (change.sIndex === sIndex && change.wIndex === wordIndex) {
+                        return {
+                            ...change,
+                            newWord: word
+                        }
+                    }
+                    return change
+                }
+                ))
+            } 
+        } else {
+            if (transcriptFile[sIndex].Words[wordIndex].hasOwnProperty('IsNewWord') === false) {
+                setTranscriptChanges([...transcriptChanges, {
+                    action: word === '' ? 'delete': 'replace',
+                    sIndex,
+                    wIndex: wordIndex,
+                    word: oldword,
+                    newWord: word
+                }])
+            } else {
+                
+                setTranscriptChanges([...transcriptChanges, {
+                    action: 'add',
+                    sIndex,
+                    wIndex: wordIndex+1,
+                    word: oldword,
+                    newWord: word
+                }])
+
+        }
     }
+}
+
+    
     const onChangeWord = (oldword: string, word: string | null, sIndex: number, wordIndex: number) => {
-        if (word === null || oldword === word) {
+        if (word === null || oldword === word || word === '') {
             return false
         }
 
@@ -130,8 +158,10 @@ const TranscriptFile: FC<TranscriptFileInterface> = ({playHead}) => {
                 IsNewWord: true
             }
             updateTranscriptFile[sIndex].Words.splice(wordIndex + 1, 0, emptyWordObject)
-
+            
             setTranscriptFile(updateTranscriptFile)
+            //we need update transcriptChanges if(wordIndex > object.wIndex):
+
 
             //Set new triggerElem for change focus
             setTriggerElement(`sentence_${sIndex}_word_${wordIndex + 1}`)
@@ -144,12 +174,9 @@ const TranscriptFile: FC<TranscriptFileInterface> = ({playHead}) => {
             return false
         }
 
-        // if object doesn't exist, add it to the array:
-       
-        handleTranscriptChanges(oldword, wordIndex, sIndex , word)
+        console.log(wordIndex);
+        handleTranscriptChanges(oldword, word, sIndex , wordIndex);
 
-        // console.log(transcriptChanges);
-        // console.log(word)
     }
 
     if (!transcriptFile.length) return null;

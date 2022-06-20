@@ -4,6 +4,7 @@ export interface WordInterface {
     LogNote: null
     Tag: number
     Text: string
+    IsNewWord?: boolean
     TimeRange: {
         StartTime: number;
         EndTime: number;
