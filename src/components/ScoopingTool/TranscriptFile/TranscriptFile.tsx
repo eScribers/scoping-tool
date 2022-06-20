@@ -15,6 +15,7 @@ interface TranscriptFileInterface {
 }
 
 interface TranscriptChangesInterface {
+    action: string,
     sIndex: number,
     wIndex: number,
     word: String,
@@ -29,15 +30,23 @@ const textContainerStyle: CSSProperties = {
 const TranscriptFile: FC<TranscriptFileInterface> = ({playHead}) => {
     const [transcriptChanges, setTranscriptChanges] = useState<TranscriptChangesInterface[]>([
         {
+            action: 'replace',
             sIndex: 2,
             wIndex: 3,
             word: "Sam",
             newWord: "new test word"
         }, {
+            action: 'add',
             sIndex: 2,
             wIndex: 4,
-            word: "How",
+            word: "",
             newWord: "new test word2"
+        }, {
+            action: 'delete',
+            sIndex: 2,
+            wIndex: 4,
+            word: "",
+            newWord: ""
         }
     ]);
     const [transcriptFile, setTranscriptFile] = useState<SentenceInterface[]>([]);
@@ -82,6 +91,23 @@ const TranscriptFile: FC<TranscriptFileInterface> = ({playHead}) => {
         console.log(response.data)
     }
 
+
+    const handleTranscriptChanges = (oldword: string, word: string | null, sIndex: number, wordIndex: number) => { 
+
+        const indexOfChangeState = transcriptChanges.findIndex((obj: TranscriptChangesInterface) => obj.sIndex === sIndex && obj.wIndex === wordIndex)
+        if (indexOfChangeState === -1) {
+            const IsNew = transcriptFile[sIndex].Words[wordIndex].IsNewWord
+            var newObj = {sIndex: sIndex, wIndex: wordIndex, word: oldword, newWord: word, action: IsNew ? 'add' : 'replace'}
+            setTranscriptChanges((transcriptChanges) => [...transcriptChanges, newObj])
+        }
+        // else object exist and we need to update it:
+        else {
+            const newTranscriptChanges = _.cloneDeep(transcriptChanges)
+            newTranscriptChanges[indexOfChangeState].newWord = word
+            setTranscriptChanges(newTranscriptChanges)
+        }
+
+    }
     const onChangeWord = (oldword: string, word: string | null, sIndex: number, wordIndex: number) => {
         if (word === null || oldword === word) {
             return false
@@ -100,7 +126,8 @@ const TranscriptFile: FC<TranscriptFileInterface> = ({playHead}) => {
                 LogNote: null,
                 Tag: 0,
                 Text: '',
-                TimeRange: null
+                TimeRange: null,
+                IsNewWord: true
             }
             updateTranscriptFile[sIndex].Words.splice(wordIndex + 1, 0, emptyWordObject)
 
@@ -117,28 +144,9 @@ const TranscriptFile: FC<TranscriptFileInterface> = ({playHead}) => {
             return false
         }
 
-        // console.log(sIndex, wordIndex, word, oldword);
         // if object doesn't exist, add it to the array:
-        const indexOfChangeState = transcriptChanges.findIndex((obj: TranscriptChangesInterface) => obj.sIndex === sIndex && obj.wIndex === wordIndex)
-        if (indexOfChangeState === -1) {
-            var newObj = {sIndex: sIndex, wIndex: wordIndex, word: oldword, newWord: word}
-            console.log(newObj);
-            setTranscriptChanges((transcriptChanges) => [...transcriptChanges, newObj])
-        }
-        // else object exist and we need to update it:
-        else {
-            const newTranscriptChanges = _.cloneDeep(transcriptChanges)
-            newTranscriptChanges[indexOfChangeState].newWord = word
-            setTranscriptChanges(newTranscriptChanges)
-        }
-        // if we have more than 20 object in transcriptChanges, send an api request to update the db:
-        if (transcriptChanges.length > 20) {
-            console.log("sending request to update db");
-            // create a new request
-            sendChanges();
-            // clear the array
-            setTranscriptChanges([])
-        }
+       
+        handleTranscriptChanges(oldword, wordIndex, sIndex , word)
 
         // console.log(transcriptChanges);
         // console.log(word)
