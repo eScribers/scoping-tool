@@ -7,7 +7,7 @@ export interface WordInterface {
     TimeRange: {
         StartTime: number;
         EndTime: number;
-    }
+    } | null
 }
 
 export interface SentenceInterface {

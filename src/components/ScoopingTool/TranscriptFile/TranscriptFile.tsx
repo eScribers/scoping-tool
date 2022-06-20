@@ -41,6 +41,7 @@ const TranscriptFile: FC<TranscriptFileInterface> = ({playHead}) => {
         }
     ]);
     const [transcriptFile, setTranscriptFile] = useState<SentenceInterface[]>([]);
+    const [triggerElement, setTriggerElement] = useState<string | null>(null)
     const textContainerRef = useRef<HTMLDivElement>(null)
 
     const loadFile = async () => {
@@ -65,6 +66,13 @@ const TranscriptFile: FC<TranscriptFileInterface> = ({playHead}) => {
         loadFile();
     }, []);
 
+    useEffect(() => {
+        if (triggerElement !== null) {
+            // @ts-ignore
+            document.getElementById(triggerElement).focus()
+        }
+    }, [triggerElement])
+
     const sendChanges = async () => {
         const response = await axios.post(
             'https://example.com',
@@ -73,13 +81,43 @@ const TranscriptFile: FC<TranscriptFileInterface> = ({playHead}) => {
         )
         console.log(response.data)
     }
-    const onChangeWord = (oldword: string, word: string | null, sIndex: number, wordIndex: number) => {
 
+    const onChangeWord = (oldword: string, word: string | null, sIndex: number, wordIndex: number) => {
         if (word === null || oldword === word) {
             return false
         }
 
-        console.log(sIndex, wordIndex, word, oldword);
+        const updateTranscriptFile = _.cloneDeep(transcriptFile)
+        updateTranscriptFile[sIndex].Words[wordIndex].Text = word
+
+
+        let spaceSymbol = new RegExp("\\s+");
+        //if last symbol === space, we adding new empty word object and update our transcript file an
+        if (word.split('')[word.length - 1].match(spaceSymbol)) {
+            let emptyWordObject: WordInterface = {
+                ConfidenceLevel: null,
+                FormatWord: null,
+                LogNote: null,
+                Tag: 0,
+                Text: '',
+                TimeRange: null
+            }
+            updateTranscriptFile[sIndex].Words.splice(wordIndex + 1, 0, emptyWordObject)
+
+            setTranscriptFile(updateTranscriptFile)
+
+            //Set new triggerElem for change focus
+            setTriggerElement(`sentence_${sIndex}_word_${wordIndex + 1}`)
+        }
+
+    }
+
+    const onBlurWord = (oldword: string, word: string | null, sIndex: number, wordIndex: number) => {
+        if (word === null || oldword === word) {
+            return false
+        }
+
+        // console.log(sIndex, wordIndex, word, oldword);
         // if object doesn't exist, add it to the array:
         const indexOfChangeState = transcriptChanges.findIndex((obj: TranscriptChangesInterface) => obj.sIndex === sIndex && obj.wIndex === wordIndex)
         if (indexOfChangeState === -1) {
@@ -102,8 +140,8 @@ const TranscriptFile: FC<TranscriptFileInterface> = ({playHead}) => {
             setTranscriptChanges([])
         }
 
-        console.log(transcriptChanges);
-        console.log(word)
+        // console.log(transcriptChanges);
+        // console.log(word)
     }
 
     if (!transcriptFile.length) return null;
@@ -144,13 +182,18 @@ const TranscriptFile: FC<TranscriptFileInterface> = ({playHead}) => {
                                         }
 
                                         return (
-                                            <span id={`sentence_${s_index}_word_${index}`} key={index}
-                                                  style={isInTimeRange ? {background: 'yellow'} : {}}
-                                                  contentEditable
-                                                  suppressContentEditableWarning={true}
-                                                  onBlur={(e) => {
-                                                      onChangeWord(word.Text, e.target.textContent, s_index, index)
-                                                  }}
+                                            <span
+                                                id={`sentence_${s_index}_word_${index}`}
+                                                key={index}
+                                                style={isInTimeRange ? {background: 'yellow'} : {}}
+                                                contentEditable
+                                                suppressContentEditableWarning={true}
+                                                onInput={(e) => {
+                                                    onChangeWord(word.Text, e.currentTarget.textContent, s_index, index)
+                                                }}
+                                                onBlur={(e) => {
+                                                    onBlurWord(word.Text, e.currentTarget.textContent, s_index, index)
+                                                }}
                                             >
                                           {word.Text}
                                       </span>
