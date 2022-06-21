@@ -1,5 +1,5 @@
 import {CSSProperties, FC, useEffect, useState, useRef} from "react";
-import {Typography, Space, Card, Divider} from "antd";
+import {Typography, Space, Card, Divider, Button} from "antd";
 import {SentenceInterface, WordInterface} from "../types";
 import CopyBtn from "../ScoopingButtons/CopyBtn";
 import DownloadWord from "../ScoopingButtons/DownloadWord";
@@ -38,6 +38,7 @@ const TranscriptFile: FC<TranscriptFileInterface> = ({playHead}) => {
     const [transcriptChanges, setTranscriptChanges] = useState<TranscriptChangesInterface[]>([]);
     const [transcriptFile, setTranscriptFile] = useState<SentenceInterface[]>([]);
     const [speakersName, setSpeakersName] = useState<string[]>([])
+    const [isScrollLock, setIsScrollLock] = useState<boolean>(false)
     const [triggerElement, setTriggerElement] = useState<triggerElemInterface | null>(null)
     const textContainerRef = useRef<HTMLDivElement>(null)
 
@@ -217,6 +218,9 @@ const TranscriptFile: FC<TranscriptFileInterface> = ({playHead}) => {
                         width: '100%',
                     }}
                 >
+                    <Button type='primary' onClick={()=>setIsScrollLock(!isScrollLock)}>
+                        {isScrollLock ? 'Unlock Scroll' : 'Lock Scroll'}
+                    </Button>
                     <CopyBtn transcriptFile={transcriptFile}/>
                     <Text>Edit transcription text below</Text>
                     <DownloadWord/>
@@ -245,7 +249,7 @@ const TranscriptFile: FC<TranscriptFileInterface> = ({playHead}) => {
                                             isInTimeRange = word.TimeRange.StartTime <= playHead && word.TimeRange.EndTime >= playHead;
                                         }
 
-                                        if (isInTimeRange) {
+                                        if (isInTimeRange && !isScrollLock) {
                                             document.getElementById(`sentence_${s_index}_word_${index}`)?.scrollIntoView({
                                                 block: 'center',
                                             });
