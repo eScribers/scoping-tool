@@ -4,6 +4,7 @@ import {SentenceInterface, WordInterface} from "../types";
 import CopyBtn from "../ScoopingButtons/CopyBtn";
 import DownloadWord from "../ScoopingButtons/DownloadWord";
 import DownloadPDF from "../ScoopingButtons/DownloadPDF";
+import TranscriptFileEditSpeaker from "./TranscriptFileEditSpeaker";
 import _ from "lodash";
 import axios from "axios";
 import moment from "moment";
@@ -23,7 +24,7 @@ interface TranscriptChangesInterface {
 }
 
 interface triggerElemInterface {
-    prevElem:string,
+    prevElem: string,
     currentElem: string
 }
 
@@ -36,6 +37,7 @@ const textContainerStyle: CSSProperties = {
 const TranscriptFile: FC<TranscriptFileInterface> = ({playHead}) => {
     const [transcriptChanges, setTranscriptChanges] = useState<TranscriptChangesInterface[]>([]);
     const [transcriptFile, setTranscriptFile] = useState<SentenceInterface[]>([]);
+    const [speakersName, setSpeakersName] = useState<string[]>([])
     const [triggerElement, setTriggerElement] = useState<triggerElemInterface | null>(null)
     const textContainerRef = useRef<HTMLDivElement>(null)
 
@@ -54,7 +56,11 @@ const TranscriptFile: FC<TranscriptFileInterface> = ({playHead}) => {
                 }))
             }
         ))
+        const allSpeakersName: string[] = converted.map((sentence: SentenceInterface) => sentence.NameSpeaker)
+        const uniqSpeakersName = [...new Set(allSpeakersName)]
+
         setTranscriptFile(converted);
+        setSpeakersName(uniqSpeakersName)
     }
 
     useEffect(() => {
@@ -73,6 +79,10 @@ const TranscriptFile: FC<TranscriptFileInterface> = ({playHead}) => {
     useEffect(() => {
         console.log('transcriptChanges', transcriptChanges)
     }, [transcriptChanges])
+
+    useEffect(() => {
+        console.log('speakersName', speakersName)
+    }, [speakersName])
 
     const sendChanges = async () => {
         const response = await axios.post(
@@ -137,8 +147,7 @@ const TranscriptFile: FC<TranscriptFileInterface> = ({playHead}) => {
         }
     }
 
-
-    const onChangeWord = (oldword: string, word: string | null, sIndex: number, wordIndex: number, keyCode:string) => {
+    const onChangeWord = (oldword: string, word: string | null, sIndex: number, wordIndex: number, keyCode: string) => {
         if (word === null || oldword === word || word === '') {
             return false
         }
@@ -184,7 +193,7 @@ const TranscriptFile: FC<TranscriptFileInterface> = ({playHead}) => {
     }
 
     const onBlurWord = (oldword: string, word: string | null, sIndex: number, wordIndex: number) => {
-        if (word === null || oldword === word) {
+        if (word === null || oldword.trim() === word.trim()) {
             return false
         }
 
@@ -196,6 +205,7 @@ const TranscriptFile: FC<TranscriptFileInterface> = ({playHead}) => {
         handleTranscriptChanges(oldword, word, sIndex, wordIndex);
 
     }
+
 
     if (!transcriptFile.length) return null;
 
@@ -219,7 +229,14 @@ const TranscriptFile: FC<TranscriptFileInterface> = ({playHead}) => {
                     {transcriptFile.map((sentence: SentenceInterface, s_index: number) => {
                         return (
                             <div key={s_index}>
-                                <Title level={4}>{sentence.NameSpeaker}</Title>
+                                <TranscriptFileEditSpeaker
+                                    transcriptFile={transcriptFile}
+                                    setTranscriptFile={setTranscriptFile}
+                                    speakersName={speakersName}
+                                    setSpeakersName={setSpeakersName}
+                                    nameSpeaker={sentence.NameSpeaker}
+                                    sIndex={s_index}
+                                />
                                 <Paragraph>
                                     {sentence.Words.map((word: WordInterface, index: number) => {
                                         // Check if the word is in the current time range
