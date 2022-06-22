@@ -15,3 +15,22 @@ export interface SentenceInterface {
     NameSpeaker: string;
     Words: WordInterface[];
 }
+
+export interface TranscriptChangesInterface {
+    action: String,
+    sIndex: number,
+    wIndex: number,
+    word: String,
+    newWord: String | null
+}
+
+export interface HandleWordBlurInterface {
+    oldword: string,
+    word: string | null,
+    sIndex: number,
+    wordIndex: number
+}
+
+export interface HandleWordChangeInterface extends HandleWordBlurInterface {
+    keyCode: string
+}

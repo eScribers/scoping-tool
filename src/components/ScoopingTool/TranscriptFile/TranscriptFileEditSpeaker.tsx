@@ -70,11 +70,11 @@ const TranscriptFileEditSpeaker: FC<EditSpeakerInterface> = ({
                 </Popover>
                 <span
                     contentEditable
+                    suppressContentEditableWarning={true}
                     onBlur={(e) => onSpeakerNameChange(nameSpeaker, e.currentTarget.textContent)}
                 >
                 {nameSpeaker}
                 </span>
-
             </Space>
         </Title>
     )

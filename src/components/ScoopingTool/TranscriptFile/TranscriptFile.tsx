@@ -1,26 +1,26 @@
-import {CSSProperties, FC, useEffect, useState, useRef} from "react";
-import {Typography, Space, Card, Divider, Button} from "antd";
-import {SentenceInterface, WordInterface} from "../types";
+import React, {CSSProperties, FC, useEffect, useState, useRef} from "react";
+import {Typography, Space, Card, Divider, Button, Popover} from "antd";
+import {
+    SentenceInterface,
+    WordInterface,
+    TranscriptChangesInterface,
+    HandleWordBlurInterface,
+    HandleWordChangeInterface
+} from "../types";
 import CopyBtn from "../ScoopingButtons/CopyBtn";
 import DownloadWord from "../ScoopingButtons/DownloadWord";
 import DownloadPDF from "../ScoopingButtons/DownloadPDF";
 import TranscriptFileEditSpeaker from "./TranscriptFileEditSpeaker";
+import TranscriptFileWord from "./TranscriptFileWord";
 import _ from "lodash";
 import axios from "axios";
 import moment from "moment";
+import TranscriptFileSentenceControl from "./TranscriptFileSentenceControl/TranscriptFileSentenceControl";
 
-const {Title, Paragraph, Text} = Typography
+const {Paragraph, Text} = Typography
 
 interface TranscriptFileInterface {
     playHead: number
-}
-
-interface TranscriptChangesInterface {
-    action: String,
-    sIndex: number,
-    wIndex: number,
-    word: String,
-    newWord: String | null
 }
 
 interface triggerElemInterface {
@@ -33,13 +33,12 @@ const textContainerStyle: CSSProperties = {
     overflowY: 'scroll'
 }
 
-
 const TranscriptFile: FC<TranscriptFileInterface> = ({playHead}) => {
     const [transcriptChanges, setTranscriptChanges] = useState<TranscriptChangesInterface[]>([]);
     const [transcriptFile, setTranscriptFile] = useState<SentenceInterface[]>([]);
     const [speakersName, setSpeakersName] = useState<string[]>([])
-    const [isScrollLock, setIsScrollLock] = useState<boolean>(false)
     const [triggerElement, setTriggerElement] = useState<triggerElemInterface | null>(null)
+    const [isScrollLock, setIsScrollLock] = useState<boolean>(false)
     const textContainerRef = useRef<HTMLDivElement>(null)
 
     const loadFile = async () => {
@@ -57,12 +56,16 @@ const TranscriptFile: FC<TranscriptFileInterface> = ({playHead}) => {
                 }))
             }
         ))
-        const allSpeakersName: string[] = converted.map((sentence: SentenceInterface) => sentence.NameSpeaker)
-        const uniqSpeakersName = [...new Set(allSpeakersName)]
 
         setTranscriptFile(converted);
-        setSpeakersName(uniqSpeakersName)
     }
+
+    useEffect(() => {
+        const allSpeakersName: string[] = transcriptFile.map((sentence: SentenceInterface) => sentence.NameSpeaker)
+        const uniqSpeakersName = [...new Set(allSpeakersName)]
+
+        setSpeakersName(uniqSpeakersName)
+    }, [transcriptFile])
 
     useEffect(() => {
         loadFile();
@@ -95,7 +98,9 @@ const TranscriptFile: FC<TranscriptFileInterface> = ({playHead}) => {
     }
 
 
-    const handleTranscriptChanges = (oldword: string, word: string, sIndex: number, wordIndex: number) => {
+    const handleTranscriptChanges = (params: HandleWordBlurInterface) => {
+        const {oldword, word, sIndex, wordIndex} = params
+
         //if sIndex and sIndex equel to current object.sIndex and object.wIndex in transcriptChanges then update the word:
         const transcriptChange = transcriptChanges.find((change: TranscriptChangesInterface) => (
             change.sIndex === sIndex && change.wIndex === wordIndex
@@ -148,7 +153,8 @@ const TranscriptFile: FC<TranscriptFileInterface> = ({playHead}) => {
         }
     }
 
-    const onChangeWord = (oldword: string, word: string | null, sIndex: number, wordIndex: number, keyCode: string) => {
+    const onChangeWord = (params: HandleWordChangeInterface) => {
+        const {oldword, word, sIndex, wordIndex, keyCode} = params
         if (word === null || oldword === word || word === '') {
             return false
         }
@@ -193,7 +199,8 @@ const TranscriptFile: FC<TranscriptFileInterface> = ({playHead}) => {
 
     }
 
-    const onBlurWord = (oldword: string, word: string | null, sIndex: number, wordIndex: number) => {
+    const onBlurWord = (params: HandleWordBlurInterface) => {
+        const {oldword, word, sIndex, wordIndex} = params
         if (word === null || oldword.trim() === word.trim()) {
             return false
         }
@@ -203,8 +210,19 @@ const TranscriptFile: FC<TranscriptFileInterface> = ({playHead}) => {
 
         setTranscriptFile(updateTranscriptFile)
 
-        handleTranscriptChanges(oldword, word, sIndex, wordIndex);
+        handleTranscriptChanges({oldword, word, sIndex, wordIndex});
 
+    }
+
+    const handleUtilSentences = (targetSIndex: number, sIndex: number) => {
+
+        const updateTranscriptFile = _.cloneDeep(transcriptFile)
+
+        updateTranscriptFile[targetSIndex].Words.push(...updateTranscriptFile[sIndex].Words)
+        updateTranscriptFile.splice(sIndex, 1)
+
+        setTranscriptFile(updateTranscriptFile)
+        setTranscriptChanges(transcriptChanges.filter(change=> change.sIndex !== sIndex))
     }
 
 
@@ -218,7 +236,7 @@ const TranscriptFile: FC<TranscriptFileInterface> = ({playHead}) => {
                         width: '100%',
                     }}
                 >
-                    <Button type='primary' onClick={()=>setIsScrollLock(!isScrollLock)}>
+                    <Button type='primary' onClick={() => setIsScrollLock(!isScrollLock)}>
                         {isScrollLock ? 'Unlock Scroll' : 'Lock Scroll'}
                     </Button>
                     <CopyBtn transcriptFile={transcriptFile}/>
@@ -232,7 +250,7 @@ const TranscriptFile: FC<TranscriptFileInterface> = ({playHead}) => {
                 <Card>
                     {transcriptFile.map((sentence: SentenceInterface, s_index: number) => {
                         return (
-                            <div key={s_index}>
+                            <Card type={'inner'} key={s_index}>
                                 <TranscriptFileEditSpeaker
                                     transcriptFile={transcriptFile}
                                     setTranscriptFile={setTranscriptFile}
@@ -242,40 +260,36 @@ const TranscriptFile: FC<TranscriptFileInterface> = ({playHead}) => {
                                     sIndex={s_index}
                                 />
                                 <Paragraph>
-                                    {sentence.Words.map((word: WordInterface, index: number) => {
-                                        // Check if the word is in the current time range
-                                        let isInTimeRange = null;
+                                    {sentence.Words.map((word: WordInterface, wIndex: number) => {
+                                        let isInTimeRange = null
                                         if (word.TimeRange?.StartTime) {
-                                            isInTimeRange = word.TimeRange.StartTime <= playHead && word.TimeRange.EndTime >= playHead;
+                                            isInTimeRange = word.TimeRange.StartTime <= playHead && word.TimeRange.EndTime >= playHead
                                         }
-
                                         if (isInTimeRange && !isScrollLock) {
-                                            document.getElementById(`sentence_${s_index}_word_${index}`)?.scrollIntoView({
+                                            document.getElementById(`sentence_${s_index}_word_${wIndex}`)?.scrollIntoView({
                                                 block: 'center',
                                             });
                                         }
-
                                         return (
-                                            <span
-                                                id={`sentence_${s_index}_word_${index}`}
-                                                key={index}
-                                                style={isInTimeRange ? {background: 'yellow'} : {}}
-                                                contentEditable
-                                                suppressContentEditableWarning={true}
-                                                onKeyUp={(e) => {
-                                                    onChangeWord(word.Text, e.currentTarget.textContent, s_index, index, e.code)
-                                                }}
-
-                                                onBlur={(e) => {
-                                                    onBlurWord(word.Text, e.currentTarget.textContent, s_index, index)
-                                                }}
-                                            >
-                                          {word.Text}
-                                      </span>
+                                            <TranscriptFileWord
+                                                onChangeWord={onChangeWord}
+                                                onBlurWord={onBlurWord}
+                                                word={word}
+                                                sIndex={s_index}
+                                                wIndex={wIndex}
+                                                key={`${word.Text}${s_index}${wIndex}`}
+                                                isInTimeRange={isInTimeRange}
+                                            />
                                         )
                                     })}
+                                    <TranscriptFileSentenceControl
+                                        transcriptFile={transcriptFile}
+                                        speakerName={sentence.NameSpeaker}
+                                        sIndex={s_index}
+                                        handleUtilSentences={handleUtilSentences}
+                                    />
                                 </Paragraph>
-                            </div>
+                            </Card>
                         );
                     })}
                 </Card>
