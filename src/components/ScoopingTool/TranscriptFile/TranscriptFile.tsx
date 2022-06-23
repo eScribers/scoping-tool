@@ -222,7 +222,7 @@ const TranscriptFile: FC<TranscriptFileInterface> = ({playHead}) => {
         updateTranscriptFile.splice(sIndex, 1)
 
         setTranscriptFile(updateTranscriptFile)
-        setTranscriptChanges(transcriptChanges.filter(change=> change.sIndex !== sIndex))
+        setTranscriptChanges(transcriptChanges.filter(change => change.sIndex !== sIndex))
     }
 
 
@@ -249,6 +249,17 @@ const TranscriptFile: FC<TranscriptFileInterface> = ({playHead}) => {
             <div style={textContainerStyle} ref={textContainerRef}>
                 <Card>
                     {transcriptFile.map((sentence: SentenceInterface, s_index: number) => {
+                        const wordWithTime = sentence.Words.find(word => word.TimeRange?.StartTime !== null)
+                        let renderItem = null
+
+                        if (wordWithTime?.TimeRange?.StartTime) {
+                            renderItem = wordWithTime.TimeRange.StartTime <= playHead + 100 && wordWithTime.TimeRange.StartTime >= playHead - 100
+                        }
+
+                        if (!renderItem) {
+                            return null
+                        }
+
                         return (
                             <Card type={'inner'} key={s_index}>
                                 <TranscriptFileEditSpeaker
