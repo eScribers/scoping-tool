@@ -42,8 +42,42 @@ const TranscriptFile: FC<TranscriptFileInterface> = ({playHead}) => {
     const textContainerRef = useRef<HTMLDivElement>(null)
 
     const loadFile = async () => {
-        const file = await fetch('/transcripts/36939240-df53-4e05-b1e5-d450980e3a34-adapted_20220509_223453_08sa_4c088156.json');
-        const text = await file.json();
+      
+        const requestOptions = {
+            headers: { 'Content-Type': 'application/json' },
+            auth: {
+                username: "admin",
+                password: "Test#123"
+              },
+            body: JSON.stringify({
+                "sort": {
+                  "Sentenceindex": {
+                    "order": "asc"
+                  },
+                   "WordIndex": {
+                    "order": "asc"
+                  }
+                },
+                "query": {
+                  "match_phrase": {
+                    "TabulaJobRef": "NYCDOE215892"
+                  }
+                }
+              })
+        };
+        // Simple GET request with a requestOptions JSON body using fetch:
+        const text = await axios.get('https://search-myscopingtooldomain-a5n4jhnv7oi7lfbvflh42ly2hu.us-east-1.es.amazonaws.com/original_documents/_search?filter_path=hits.hits._source', requestOptions).then(response => {
+            return response.data.hits.hits[0]._source;
+        }
+        ).catch(error => {
+            console.log(error);
+        }
+        );
+
+
+        //const file = await fetch('/transcripts/36939240-df53-4e05-b1e5-d450980e3a34-adapted_20220509_223453_08sa_4c088156.json');
+        //const text = await file.json();
+        console.log(text);
         const converted = text.DocumentParts.map((sentence: SentenceInterface) => (
             {
                 ...sentence,
