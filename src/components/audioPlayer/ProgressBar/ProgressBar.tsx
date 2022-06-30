@@ -1,6 +1,8 @@
 import "./ProgressBar.scss"
-import {CSSProperties, FC, useEffect} from "react";
+import {CSSProperties, FC, useEffect, useState} from "react";
 import {Slider, Typography} from "antd";
+import rootStore from "../../../store";
+import {observer} from "mobx-react-lite";
 
 const {Text} = Typography
 
@@ -29,8 +31,14 @@ const secondInMinutes = (value: number | undefined) => {
 }
 
 const ProgressBar: FC<ProgressBarInterface> = ({audioRef}) => {
-    const currentTime = audioRef.current?.currentTime
-    const duration = audioRef.current?.duration
+    const [duration, setDuration] = useState(0)
+    const {playHead} = rootStore.audioStore
+
+    useEffect(() => {
+        if (audioRef.current?.duration && duration !== audioRef.current.duration) {
+            setDuration(audioRef.current.duration)
+        }
+    }, [playHead])
 
     const marks = {
         0: {
@@ -58,7 +66,7 @@ const ProgressBar: FC<ProgressBarInterface> = ({audioRef}) => {
         <div className='audio-progress-bar'>
             <Slider
                 defaultValue={0}
-                value={currentTime}
+                value={playHead}
                 min={0}
                 max={duration}
                 tooltipVisible={true}
@@ -73,4 +81,4 @@ const ProgressBar: FC<ProgressBarInterface> = ({audioRef}) => {
     )
 }
 
-export default ProgressBar
+export default observer(ProgressBar)

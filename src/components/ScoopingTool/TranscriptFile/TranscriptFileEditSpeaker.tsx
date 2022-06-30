@@ -3,40 +3,38 @@ import {SentenceInterface} from "../types";
 import {Button, Typography, Space, Popover, Select} from "antd";
 import {EditOutlined} from "@ant-design/icons";
 import _ from "lodash";
+import rootStore from "../../../store";
+import {observer} from "mobx-react-lite";
 
 const {Title} = Typography
 const {Option} = Select
 
 interface EditSpeakerInterface {
-    transcriptFile: SentenceInterface[],
-    setTranscriptFile: (sentences: SentenceInterface[]) => void,
-    speakersName: string[],
-    setSpeakersName: (array: string[]) => void,
     nameSpeaker: string,
     sIndex: number
 }
 
 const TranscriptFileEditSpeaker: FC<EditSpeakerInterface> = ({
-                                                                 transcriptFile,
-                                                                 setTranscriptFile,
-                                                                 speakersName,
-                                                                 setSpeakersName,
                                                                  nameSpeaker,
                                                                  sIndex
                                                              }) => {
+    const {transcriptStore} = rootStore
+    const {transcriptFile, speakersName} = transcriptStore
+
     const onSpeakerNameChange = (oldname: string, newname: string | null) => {
         if (oldname === newname || newname === null) {
             return false
         }
 
-        const updateTranscriptFile = _.cloneDeep(transcriptFile)
-        updateTranscriptFile[sIndex].NameSpeaker = newname.toUpperCase()
 
-        setTranscriptFile(updateTranscriptFile)
+        const updateTranscriptFile = [...transcriptFile]
+        updateTranscriptFile[sIndex].Speaker = newname.toUpperCase()
+
+        transcriptStore.setTranscriptFile(updateTranscriptFile)
 
 
         if (speakersName.find((title: string) => title.toUpperCase() === newname.toUpperCase()) === undefined) {
-            setSpeakersName([...speakersName, newname.toUpperCase()])
+            transcriptStore.setSpeakersName([...speakersName, newname.toUpperCase()])
         }
     }
 
@@ -80,4 +78,4 @@ const TranscriptFileEditSpeaker: FC<EditSpeakerInterface> = ({
     )
 }
 
-export default TranscriptFileEditSpeaker
+export default observer(TranscriptFileEditSpeaker)
