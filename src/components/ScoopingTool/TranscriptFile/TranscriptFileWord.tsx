@@ -1,13 +1,14 @@
-import React, {FC} from "react"
+import React, {FC, useEffect, useState} from "react"
 import {WordInterface, HandleWordBlurInterface, HandleWordChangeInterface} from "../types";
+import {observer} from "mobx-react-lite";
+import audioParams from "../../../store";
 
 interface FileWordInterface {
     onChangeWord: (params: HandleWordChangeInterface) => void,
     onBlurWord: (params: HandleWordBlurInterface) => void,
     word: WordInterface,
     sIndex: number,
-    wIndex: number,
-    isInTimeRange: boolean | null
+    wIndex: number
 }
 
 const TranscriptFileWord: FC<FileWordInterface> = ({
@@ -15,9 +16,28 @@ const TranscriptFileWord: FC<FileWordInterface> = ({
                                                        onBlurWord,
                                                        word,
                                                        sIndex,
-                                                       wIndex,
-                                                       isInTimeRange
+                                                       wIndex
                                                    }) => {
+    const {playHead} = audioParams
+    const [isInTimeRange, setIsInTimeRange] = useState<boolean>(false)
+
+    useEffect(()=>{
+        if (word.TimeRange?.StartTime) {
+            setIsInTimeRange(word.TimeRange.StartTime <= playHead && word.TimeRange.EndTime >= playHead)
+        }
+    },[playHead])
+
+    useEffect(()=>{
+        if(isInTimeRange){
+            document.getElementById(`sentence_${sIndex}_word_${wIndex}`)?.scrollIntoView({
+                block: 'center',
+            });
+            console.log('render',isInTimeRange)
+        }
+
+
+    },[isInTimeRange])
+    console.log('render', word.Text)
     return (
         <span
             id={`sentence_${sIndex}_word_${wIndex}`}
@@ -45,4 +65,6 @@ const TranscriptFileWord: FC<FileWordInterface> = ({
     )
 }
 
-export default React.memo(TranscriptFileWord)
+export default React.memo(observer(TranscriptFileWord),((prevProps,nextProps) => {
+    return true
+}))

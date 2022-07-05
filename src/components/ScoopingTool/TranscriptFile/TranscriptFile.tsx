@@ -19,10 +19,6 @@ import TranscriptFileSentenceControl from "./TranscriptFileSentenceControl/Trans
 
 const {Paragraph, Text} = Typography
 
-interface TranscriptFileInterface {
-    playHead: number
-}
-
 interface triggerElemInterface {
     prevElem: string,
     currentElem: string
@@ -33,7 +29,7 @@ const textContainerStyle: CSSProperties = {
     overflowY: 'scroll'
 }
 
-const TranscriptFile: FC<TranscriptFileInterface> = ({playHead}) => {
+const TranscriptFile = () => {
     const [transcriptChanges, setTranscriptChanges] = useState<TranscriptChangesInterface[]>([]);
     const [transcriptFile, setTranscriptFile] = useState<SentenceInterface[]>([]);
     const [speakersName, setSpeakersName] = useState<string[]>([])
@@ -283,16 +279,16 @@ const TranscriptFile: FC<TranscriptFileInterface> = ({playHead}) => {
             <div style={textContainerStyle} ref={textContainerRef}>
                 <Card>
                     {transcriptFile.map((sentence: SentenceInterface, s_index: number) => {
-                        const wordWithTime = sentence.Words.find(word => word.TimeRange?.StartTime !== null)
-                        let renderItem = null
-
-                        if (wordWithTime?.TimeRange?.StartTime) {
-                            renderItem = wordWithTime.TimeRange.StartTime <= playHead + 100 && wordWithTime.TimeRange.StartTime >= playHead - 100
-                        }
-
-                        if (!renderItem) {
-                            return null
-                        }
+                        // const wordWithTime = sentence.Words.find(word => word.TimeRange?.StartTime !== null)
+                        // let renderItem = null
+                        //
+                        // if (wordWithTime?.TimeRange?.StartTime) {
+                        //     renderItem = wordWithTime.TimeRange.StartTime <= playHead + 100 && wordWithTime.TimeRange.StartTime >= playHead - 100
+                        // }
+                        //
+                        // if (!renderItem) {
+                        //     return null
+                        // }
 
                         return (
                             <Card type={'inner'} key={s_index}>
@@ -306,15 +302,7 @@ const TranscriptFile: FC<TranscriptFileInterface> = ({playHead}) => {
                                 />
                                 <Paragraph>
                                     {sentence.Words.map((word: WordInterface, wIndex: number) => {
-                                        let isInTimeRange = null
-                                        if (word.TimeRange?.StartTime) {
-                                            isInTimeRange = word.TimeRange.StartTime <= playHead && word.TimeRange.EndTime >= playHead
-                                        }
-                                        if (isInTimeRange && !isScrollLock) {
-                                            document.getElementById(`sentence_${s_index}_word_${wIndex}`)?.scrollIntoView({
-                                                block: 'center',
-                                            });
-                                        }
+
                                         return (
                                             <TranscriptFileWord
                                                 onChangeWord={onChangeWord}
@@ -323,7 +311,6 @@ const TranscriptFile: FC<TranscriptFileInterface> = ({playHead}) => {
                                                 sIndex={s_index}
                                                 wIndex={wIndex}
                                                 key={`${word.Text}${s_index}${wIndex}`}
-                                                isInTimeRange={isInTimeRange}
                                             />
                                         )
                                     })}
@@ -343,4 +330,4 @@ const TranscriptFile: FC<TranscriptFileInterface> = ({playHead}) => {
     )
 }
 
-export default TranscriptFile
+export default React.memo(TranscriptFile)

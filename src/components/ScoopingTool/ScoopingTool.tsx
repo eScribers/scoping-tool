@@ -5,12 +5,11 @@ import AudioPlayer from "../audioPlayer/AudioPlayer";
 
 
 const ScoopingTool = () => {
-    const [playHead, setPlayHead] = useState<number>(0);
 
     return (
         <>
-            <AudioPlayer src="/audioFiles/test.mp3" setPlayHead={setPlayHead}/>
-            <TranscriptFile playHead={playHead}/>
+            <AudioPlayer src="/audioFiles/test.mp3" />
+            <TranscriptFile />
         </>
     )
 }
