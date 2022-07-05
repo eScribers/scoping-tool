@@ -26,16 +26,11 @@ const TranscriptFileEditSpeaker: FC<EditSpeakerInterface> = ({
             return false
         }
 
-
         const updateTranscriptFile = [...transcriptFile]
         updateTranscriptFile[sIndex].Speaker = newname.toUpperCase()
 
-        transcriptStore.setTranscriptFile(updateTranscriptFile)
+        transcriptStore.sendFile(updateTranscriptFile)
 
-
-        if (speakersName.find((title: string) => title.toUpperCase() === newname.toUpperCase()) === undefined) {
-            transcriptStore.setSpeakersName([...speakersName, newname.toUpperCase()])
-        }
     }
 
     const SpeakerSelect = (

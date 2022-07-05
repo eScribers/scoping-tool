@@ -12,12 +12,12 @@ const textContainerStyle: CSSProperties = {
 }
 
 const TranscriptFileList = () => {
-    const {transcriptFile} = rootStore.transcriptStore
+    const {transcriptFile, isLoading} = rootStore.transcriptStore
     const {playHead} = rootStore.audioStore
     // console.log(playHead)
     return (
         <div style={textContainerStyle}>
-            <Card>
+            <Card >
                 {transcriptFile.map((sentence, sIndex) => {
                     return (
                         <Card type={'inner'} key={sIndex}>

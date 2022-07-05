@@ -1,7 +1,7 @@
 import {Typography} from "antd";
 import {observer} from "mobx-react-lite";
 import rootStore from "../../../store";
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useState, useRef} from "react";
 
 const {Paragraph} = Typography
 
@@ -16,38 +16,52 @@ interface SentenceInterface {
 const TranscriptFileSentence = ({text, startTime, endTime, playHead, sIndex}: SentenceInterface) => {
     const [isInTimeRange, setIsInTimeRange] = useState<boolean>(false)
     const {transcriptStore} = rootStore
+    const {isScrollLock} = transcriptStore
+    const refSentence = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
-        // setIsInTimeRange(startTime <= playHead)
+        setIsInTimeRange(startTime <= playHead && endTime >= playHead)
         console.log(playHead)
     }, [playHead])
 
+    useEffect(() => {
+        if (isInTimeRange && refSentence.current && !isScrollLock) {
+
+            refSentence.current.scrollIntoView({
+                block: 'center',
+            });
+            console.log('render', isInTimeRange)
+        }
+
+
+    }, [isInTimeRange])
+
+    const onHandleStart = () => {
+        transcriptStore.setIsScrollLock(true)
+    }
+
     const handleChange = (v: string) => {
-        const updateData = [...transcriptStore.transcriptFile]
-        updateData[sIndex].Text = v
-        transcriptStore.setTranscriptFile(updateData)
+        if (transcriptStore.transcriptFile[sIndex].Text !== v) {
+            const updateData = [...transcriptStore.transcriptFile]
+            updateData[sIndex].Text = v
+            transcriptStore.sendFile(updateData)
+        }
+
+        transcriptStore.setIsScrollLock(false)
     }
 
     return (
         <Paragraph
             editable={{
+                onStart: onHandleStart,
                 onChange: handleChange
             }}
             style={isInTimeRange ? {background: 'yellow'} : {}}
+            ref={refSentence}
         >
             {text}
         </Paragraph>
     )
 }
 
-export default React.memo(
-    observer(TranscriptFileSentence),
-    (prevProps, nextProps) => {
-        if (prevProps.text !== nextProps.text) {
-            return false
-        }
-        if (nextProps.startTime <= nextProps.playHead) {
-            return false
-        }
-        return true
-    })
+export default observer(TranscriptFileSentence)
