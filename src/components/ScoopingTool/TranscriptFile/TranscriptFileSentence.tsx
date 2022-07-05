@@ -44,7 +44,7 @@ const TranscriptFileSentence = ({text, startTime, endTime, playHead, sIndex}: Se
         if (transcriptStore.transcriptFile[sIndex].Text !== v) {
             const updateData = [...transcriptStore.transcriptFile]
             updateData[sIndex].Text = v
-            transcriptStore.sendFile(updateData)
+            transcriptStore.updateFile(updateData)
         }
 
         transcriptStore.setIsScrollLock(false)

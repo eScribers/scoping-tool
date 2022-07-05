@@ -4,6 +4,7 @@ import {Card} from "antd";
 import {CSSProperties} from "react";
 import TranscriptFileEditSpeaker from "./TranscriptFileEditSpeaker";
 import TranscriptFileSentence from "./TranscriptFileSentence";
+import TranscriptFileAddNewSentence from "./TranscriptFileAddNewSentence";
 import moment from "moment";
 
 const textContainerStyle: CSSProperties = {
@@ -17,7 +18,7 @@ const TranscriptFileList = () => {
     // console.log(playHead)
     return (
         <div style={textContainerStyle}>
-            <Card >
+            <Card>
                 {transcriptFile.map((sentence, sIndex) => {
                     return (
                         <Card type={'inner'} key={sIndex}>
@@ -32,6 +33,7 @@ const TranscriptFileList = () => {
                                 playHead={playHead}
                                 sIndex={sIndex}
                             />
+                            <TranscriptFileAddNewSentence sIndex={sIndex}/>
                         </Card>
 
                     )

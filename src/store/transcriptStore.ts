@@ -88,7 +88,7 @@ class TranscriptStore {
         })
     }
 
-    sendFile(data: TranscriptFileInterface[]) {
+    updateFile(data: TranscriptFileInterface[]) {
         this.setIsLoading(true)
 
         const newJSON = {
@@ -100,10 +100,13 @@ class TranscriptStore {
         }
         axios.post(`https://djrxmzl1ec.execute-api.us-east-1.amazonaws.com/Prod/scoping-tool-api-HelloWorldFunction-57Owtxk448XU/?id=${this.currentFileID}`, newJSON).then((res) => {
             console.log('post request', res)
-            if (res.status === 201) {
-                this.loadFile(res.data._id)
-            }
-            this.setIsLoading(false)
+            setTimeout(()=>{
+                if (res.status === 201) {
+                    this.loadFile(res.data._id)
+                }
+                this.setIsLoading(false)
+            },500)
+
         }).catch((error) => {
             console.log('axios error', error)
             this.setIsLoading(false)

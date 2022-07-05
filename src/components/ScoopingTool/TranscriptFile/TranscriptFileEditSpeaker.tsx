@@ -29,7 +29,7 @@ const TranscriptFileEditSpeaker: FC<EditSpeakerInterface> = ({
         const updateTranscriptFile = [...transcriptFile]
         updateTranscriptFile[sIndex].Speaker = newname.toUpperCase()
 
-        transcriptStore.sendFile(updateTranscriptFile)
+        transcriptStore.updateFile(updateTranscriptFile)
 
     }
 
