@@ -1,7 +1,7 @@
 import React, {FC, useEffect, useState} from "react"
 import {WordInterface, HandleWordBlurInterface, HandleWordChangeInterface} from "../types";
 import {observer} from "mobx-react-lite";
-import audioParams from "../../../store";
+import rootStore from "../../../store";
 
 interface FileWordInterface {
     onChangeWord: (params: HandleWordChangeInterface) => void,
@@ -18,7 +18,7 @@ const TranscriptFileWord: FC<FileWordInterface> = ({
                                                        sIndex,
                                                        wIndex
                                                    }) => {
-    const {playHead} = audioParams
+    const {playHead} = rootStore.audioStore
     const [isInTimeRange, setIsInTimeRange] = useState<boolean>(false)
 
     useEffect(()=>{
@@ -65,6 +65,4 @@ const TranscriptFileWord: FC<FileWordInterface> = ({
     )
 }
 
-export default React.memo(observer(TranscriptFileWord),((prevProps,nextProps) => {
-    return true
-}))
+export default observer(TranscriptFileWord)

@@ -1,6 +1,6 @@
 import React, {FC, useState, useRef, useEffect, useCallback} from "react";
 import PlayerControls from "./PlayerControls";
-import audioParams from "../../store";
+import rootStore from "../../store";
 
 
 interface AudioPlayerProps {
@@ -9,21 +9,26 @@ interface AudioPlayerProps {
 
 const AudioPlayer: FC<AudioPlayerProps> = ({src}) => {
     const audioRef = useRef<HTMLAudioElement>(null);
+    const {audioStore} = rootStore
 
     useEffect(() => {
         if (!audioRef.current) return;
 
         // set playHead when audio is playing
-        audioRef.current.addEventListener("timeupdate", () => {
+
+        audioRef.current.ontimeupdate = () => {
             if (!audioRef.current) return;
-            audioParams.setPlayHead(audioRef.current.currentTime);
-        });
+            // console.log(Math.ceil(audioRef.current.currentTime))
+            if(Math.ceil(audioStore.playHead) !== Math.ceil(audioRef.current.currentTime)){
+                audioStore.setPlayHead(audioRef.current.currentTime);
+            }
+        };
     }, [audioRef.current]);
 
     const justFowardHandler = useCallback((time: number) => {
         if (!audioRef.current) return;
         const setTime = audioRef.current.currentTime + time;
-        audioParams.setPlayHead(setTime);
+        audioStore.setPlayHead(setTime);
         audioRef.current.currentTime = setTime;
     }, [audioRef.current]);
 

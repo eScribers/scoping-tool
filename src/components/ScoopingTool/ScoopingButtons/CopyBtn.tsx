@@ -1,21 +1,19 @@
-import React, {FC, useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import useCopy from '@react-hook/copy';
-import {SentenceInterface, WordInterface} from "../types";
+import {TranscriptFileInterface} from "../../../store/types";
 import {Button, message} from "antd";
+import rootStore from "../../../store";
+import {observer} from "mobx-react-lite";
 
-
-interface CopyBtnInterface {
-    transcriptFile: SentenceInterface[]
-}
-
-const CopyBtn: FC<CopyBtnInterface> = ({transcriptFile}) => {
+const CopyBtn = () => {
+    const {transcriptFile} = rootStore.transcriptStore
     const [copyText, setCopyText] = useState<string>('')
     const {copy} = useCopy(copyText)
 
     useEffect(() => {
-        const text: string = transcriptFile.reduce((acc: string, sentence: SentenceInterface) => {
-            let next = acc + sentence.NameSpeaker + ':'
-            const words = sentence.Words.reduce((acc: string, word: WordInterface) => acc + word.Text, "")
+        const text: string = transcriptFile.reduce((acc: string, sentence: TranscriptFileInterface) => {
+            let next = acc + sentence.Speaker + ':'
+            const words = sentence.Text
             return next + words + '\n';
         }, "");
         setCopyText(text)
@@ -38,4 +36,4 @@ const CopyBtn: FC<CopyBtnInterface> = ({transcriptFile}) => {
     )
 }
 
-export default CopyBtn
+export default observer(CopyBtn)
