@@ -1,4 +1,4 @@
-import React, {FC, useState, useRef, useEffect, useCallback} from "react";
+import React, {FC, useRef, useEffect} from "react";
 import PlayerControls from "./PlayerControls";
 import rootStore from "../../store";
 
@@ -14,22 +14,15 @@ const AudioPlayer: FC<AudioPlayerProps> = ({src}) => {
     useEffect(() => {
         if (!audioRef.current) return;
 
-        // set playHead when audio is playing
+        audioStore.setAudioRef(audioRef.current)
 
         audioRef.current.ontimeupdate = () => {
             if (!audioRef.current) return;
             // console.log(Math.ceil(audioRef.current.currentTime))
-            if(Math.ceil(audioStore.playHead) !== Math.ceil(audioRef.current.currentTime)){
+            if (Math.ceil(audioStore.playHead) !== Math.ceil(audioRef.current.currentTime)) {
                 audioStore.setPlayHead(audioRef.current.currentTime);
             }
         };
-    }, [audioRef.current]);
-
-    const justFowardHandler = useCallback((time: number) => {
-        if (!audioRef.current) return;
-        const setTime = audioRef.current.currentTime + time;
-        audioStore.setPlayHead(setTime);
-        audioRef.current.currentTime = setTime;
     }, [audioRef.current]);
 
 
@@ -40,7 +33,7 @@ const AudioPlayer: FC<AudioPlayerProps> = ({src}) => {
                     <audio controls src={src} ref={audioRef}/>
                 </div>
             </div>
-            <PlayerControls justFowardHandler={justFowardHandler} audioRef={audioRef}/>
+            <PlayerControls/>
         </div>
     );
 };

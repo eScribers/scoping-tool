@@ -1,17 +1,16 @@
-import React, {FC, useEffect, useState} from "react";
+import React, { useEffect, useState} from "react";
 import {Button} from "antd";
 import {AudioOutlined} from "@ant-design/icons";
+import rootStore from "../../store";
+import {observer} from "mobx-react-lite";
 
 const footPedalVendorId = 0x05F3;
 const footPedalProductId = 0x00FF;
 
-interface HidInterface {
-    justFowardHandler: (value: number) => void,
-    audioRef: { current: HTMLAudioElement | null }
-}
-
-const Hid: FC<HidInterface> = ({justFowardHandler, audioRef}) => {
+const Hid = () => {
     const [device, setDevice] = useState<any>(null);
+    const {audioStore} = rootStore
+    const {audioRef} = audioStore
 
     useEffect(() => {
         // @ts-expect-error
@@ -28,19 +27,20 @@ const Hid: FC<HidInterface> = ({justFowardHandler, audioRef}) => {
 
     useEffect(() => {
         if (!device) return;
+        if(!audioRef) return;
 
         device.addEventListener('inputreport', (event: any) => {
             let byte1 = event.data.getInt8(0);
             switch (byte1) {
                 case 1:
-                    justFowardHandler(-15);
+                    audioStore.setPlayHead(audioRef.currentTime - 15);
                     break;
                 case 2:
-                    audioRef.current?.paused ? audioRef.current.play() : audioRef.current!.pause();
+                    audioRef.paused ? audioRef.play() : audioRef.pause();
 
                     break;
                 case 4:
-                    justFowardHandler(15);
+                    audioStore.setPlayHead(audioRef.currentTime + 15);
                     break;
             }
         })
@@ -75,4 +75,4 @@ const Hid: FC<HidInterface> = ({justFowardHandler, audioRef}) => {
     )
 }
 
-export default Hid
+export default observer(Hid)

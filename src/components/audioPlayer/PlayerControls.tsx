@@ -1,4 +1,4 @@
-import React, {CSSProperties, FC, useState} from "react";
+import React, {CSSProperties} from "react";
 import {
     PauseCircleOutlined,
     PlayCircleOutlined,
@@ -10,35 +10,36 @@ import ProgressBar from "./ProgressBar/ProgressBar";
 import VolumeControl from "./VolumeControl";
 import ChanelControl from "./ChanelControl";
 import Hid from "./Hid";
+import rootStore from "../../store";
+import {observer} from "mobx-react-lite";
 
-interface PlayerControlsInterface {
-    justFowardHandler: (value: number) => void,
-    audioRef: { current: HTMLAudioElement | null }
-}
+const spaceStyle: CSSProperties = {width: '100%', justifyContent: 'center'}
 
-const spaceStyle:CSSProperties = {width: '100%', justifyContent: 'center'}
-
-const PlayerControls: FC<PlayerControlsInterface> = ({audioRef, justFowardHandler}) => {
-
-    const [isPlay, setPlay] = useState<boolean>(false)
-
+const PlayerControls = () => {
+    const {audioStore} = rootStore
+    const {isPlay, audioRef} = audioStore
 
     const playAudio = () => {
-        if (!audioRef.current) return;
+        if (!audioRef) return;
         if (!isPlay) {
-            audioRef.current.play()
+            audioRef.play()
         } else {
-            audioRef.current.pause()
+            audioRef.pause()
         }
-        setPlay(!isPlay)
+        audioStore.setIsPlay(!isPlay)
+    }
+
+    const handlerForward = (v: number) => {
+        if (!audioRef) return;
+        audioStore.setPlayHead(audioRef.currentTime + v)
     }
     return (
         <Card style={{marginBottom: 24}}>
             <div style={{marginBottom: 8}}>
-                <ProgressBar audioRef={audioRef}/>
+                <ProgressBar/>
                 <Space style={spaceStyle}>
                     <Button
-                        onClick={() => justFowardHandler(-15)}
+                        onClick={() => handlerForward(-15)}
                         title='backward -15s'
                         size='large'
                     >
@@ -52,18 +53,18 @@ const PlayerControls: FC<PlayerControlsInterface> = ({audioRef, justFowardHandle
                         {isPlay ? <PauseCircleOutlined/> : <PlayCircleOutlined/>}
                     </Button>
                     <Button
-                        onClick={() => justFowardHandler(15)}
+                        onClick={() => handlerForward(15)}
                         title='forward +15s'
                         size='large'
                     >
                         <StepForwardOutlined/>
                     </Button>
-                    <VolumeControl audioRef={audioRef}/>
+                    <VolumeControl/>
                 </Space>
             </div>
             <div>
                 <Space style={spaceStyle}>
-                    <Hid justFowardHandler={justFowardHandler} audioRef={audioRef}/>
+                    <Hid/>
                     <ChanelControl/>
                 </Space>
             </div>
@@ -72,4 +73,4 @@ const PlayerControls: FC<PlayerControlsInterface> = ({audioRef, justFowardHandle
     )
 }
 
-export default PlayerControls
+export default observer(PlayerControls)

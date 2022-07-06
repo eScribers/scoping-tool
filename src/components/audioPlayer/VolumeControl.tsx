@@ -1,15 +1,15 @@
 import {Popover, Button, Slider} from "antd";
 import {SoundOutlined} from "@ant-design/icons";
-import React, {FC, useState} from "react";
+import React from "react";
+import rootStore from "../../store";
+import {observer} from "mobx-react-lite";
 
-interface VolumeInterface {
-    audioRef: { current: HTMLAudioElement | null }
-}
+const VolumeControl = () => {
+    const {audioRef} = rootStore.audioStore
 
-const VolumeControl: FC<VolumeInterface> = ({audioRef}) => {
     const changeVolume = (value: any) => {
-        if (!audioRef.current) return;
-        audioRef.current.volume = value
+        if (!audioRef) return;
+        audioRef.volume = value
     };
 
     const volumeInput = (
@@ -39,4 +39,4 @@ const VolumeControl: FC<VolumeInterface> = ({audioRef}) => {
     )
 }
 
-export default VolumeControl
+export default observer(VolumeControl)

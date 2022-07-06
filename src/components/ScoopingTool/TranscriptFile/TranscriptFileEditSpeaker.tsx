@@ -1,8 +1,6 @@
 import {FC} from "react";
-import {SentenceInterface} from "../types";
 import {Button, Typography, Space, Popover, Select} from "antd";
-import {EditOutlined} from "@ant-design/icons";
-import _ from "lodash";
+import {EditOutlined, PlayCircleOutlined} from "@ant-design/icons";
 import rootStore from "../../../store";
 import {observer} from "mobx-react-lite";
 
@@ -11,14 +9,16 @@ const {Option} = Select
 
 interface EditSpeakerInterface {
     nameSpeaker: string,
-    sIndex: number
+    sIndex: number,
+    startTime: number
 }
 
 const TranscriptFileEditSpeaker: FC<EditSpeakerInterface> = ({
                                                                  nameSpeaker,
-                                                                 sIndex
+                                                                 sIndex,
+                                                                 startTime
                                                              }) => {
-    const {transcriptStore} = rootStore
+    const {transcriptStore, audioStore} = rootStore
     const {transcriptFile, speakersName} = transcriptStore
 
     const onSpeakerNameChange = (oldname: string, newname: string | null) => {
@@ -53,6 +53,9 @@ const TranscriptFileEditSpeaker: FC<EditSpeakerInterface> = ({
     return (
         <Title level={4}>
             <Space>
+                <Button type='primary' onClick={() => audioStore.setPlayHead(startTime)}>
+                    <PlayCircleOutlined/>
+                </Button>
                 <Popover placement="topLeft" title={'Select Speaker Name'} content={SpeakerSelect} trigger="click">
                     <Button
                         type='primary'

@@ -1,14 +1,11 @@
 import "./ProgressBar.scss"
-import {CSSProperties, FC, useEffect, useState} from "react";
+import {CSSProperties, useEffect, useState} from "react";
 import {Slider, Typography} from "antd";
 import rootStore from "../../../store";
 import {observer} from "mobx-react-lite";
 
 const {Text} = Typography
 
-interface ProgressBarInterface {
-    audioRef: { current: HTMLAudioElement | null }
-}
 
 const trackStyle: CSSProperties = {
     background: '#ffc700',
@@ -30,13 +27,14 @@ const secondInMinutes = (value: number | undefined) => {
     return `${minutes}m ${Number(seconds) < 10 ? `0${seconds}` : seconds}s`
 }
 
-const ProgressBar: FC<ProgressBarInterface> = ({audioRef}) => {
-    const [duration, setDuration] = useState(0)
-    const {playHead} = rootStore.audioStore
+const ProgressBar = () => {
+    const [duration, setDuration,] = useState(0)
+    const {playHead, audioRef} = rootStore.audioStore
 
     useEffect(() => {
-        if (audioRef.current?.duration && duration !== audioRef.current.duration) {
-            setDuration(audioRef.current.duration)
+        if (!audioRef) return;
+        if (audioRef.duration && duration !== audioRef.duration) {
+            setDuration(audioRef.duration)
         }
     }, [playHead])
 
@@ -57,8 +55,9 @@ const ProgressBar: FC<ProgressBarInterface> = ({audioRef}) => {
     }
 
     const progressOnChange = (value: number) => {
-        if (audioRef.current?.currentTime) {
-            audioRef.current.currentTime = value
+        if (!audioRef) return;
+        if (audioRef.currentTime) {
+            audioRef.currentTime = value
         }
     }
 

@@ -1,26 +1,13 @@
-import React, {CSSProperties, FC, useEffect, useState, useRef} from "react";
-import {Typography, Space, Card, Divider, Button, Popover} from "antd";
-import {
-    SentenceInterface,
-    WordInterface,
-    TranscriptChangesInterface,
-    HandleWordBlurInterface,
-    HandleWordChangeInterface
-} from "../types";
+import React, {useEffect} from "react";
+import {Typography, Space, Card, Divider, Button} from "antd";
 import CopyBtn from "../ScoopingButtons/CopyBtn";
 import DownloadWord from "../ScoopingButtons/DownloadWord";
 import DownloadPDF from "../ScoopingButtons/DownloadPDF";
-import TranscriptFileEditSpeaker from "./TranscriptFileEditSpeaker";
-import TranscriptFileWord from "./TranscriptFileWord";
-import TranscriptFileSentenceControl from "./TranscriptFileSentenceControl/TranscriptFileSentenceControl";
-import _ from "lodash";
-import axios from "axios";
 import rootStore from "../../../store";
 import {observer} from "mobx-react-lite";
 import TranscriptFileList from "./TranscriptFileList";
 
-const {Paragraph, Text} = Typography
-
+const {Text} = Typography
 
 const TranscriptFile = () => {
     const {transcriptStore} = rootStore

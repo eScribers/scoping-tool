@@ -2,7 +2,9 @@ import {makeAutoObservable} from "mobx";
 import {RootStore} from ".";
 
 class AudioStore {
+    audioRef:HTMLAudioElement | null = null;
     playHead: number = 0;
+    isPlay: boolean = false;
     rootStore: RootStore;
 
     constructor(rootStore: RootStore) {
@@ -11,7 +13,21 @@ class AudioStore {
     }
 
     setPlayHead(v: number) {
+        if (!this.audioRef) return;
         this.playHead = v;
+        this.audioRef.currentTime = v;
+        if(this.isPlay === false){
+            this.audioRef.play()
+            this.isPlay = true
+        }
+    }
+
+    setAudioRef(ref:HTMLAudioElement){
+        this.audioRef = ref
+    }
+
+    setIsPlay(v:boolean){
+        this.isPlay = v
     }
 
 

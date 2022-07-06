@@ -15,7 +15,7 @@ const textContainerStyle: CSSProperties = {
 const TranscriptFileList = () => {
     const {transcriptFile, isLoading} = rootStore.transcriptStore
     const {playHead} = rootStore.audioStore
-    // console.log(playHead)
+
     return (
         <div style={textContainerStyle}>
             <Card>
@@ -25,6 +25,7 @@ const TranscriptFileList = () => {
                             <TranscriptFileEditSpeaker
                                 nameSpeaker={sentence.Speaker}
                                 sIndex={sIndex}
+                                startTime={moment.duration(sentence.StartTime).asSeconds()}
                             />
                             <TranscriptFileSentence
                                 text={sentence.Text}
