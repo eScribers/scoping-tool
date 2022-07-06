@@ -16,10 +16,6 @@ class AudioStore {
         if (!this.audioRef) return;
         this.playHead = v;
         this.audioRef.currentTime = v;
-        if(this.isPlay === false){
-            this.audioRef.play()
-            this.isPlay = true
-        }
     }
 
     setAudioRef(ref:HTMLAudioElement){

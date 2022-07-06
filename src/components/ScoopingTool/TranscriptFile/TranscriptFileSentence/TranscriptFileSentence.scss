@@ -1,0 +1,16 @@
+.sentence-block {
+
+  &._current {
+    .ant-input, & {
+      background: yellow;
+    }
+  }
+
+  .ant-input {
+    border-color: transparent;
+
+    &:focus {
+      box-shadow: none;
+    }
+  }
+}

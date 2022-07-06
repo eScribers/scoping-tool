@@ -3,7 +3,7 @@ import {observer} from "mobx-react-lite";
 import {Card} from "antd";
 import {CSSProperties} from "react";
 import TranscriptFileEditSpeaker from "./TranscriptFileEditSpeaker";
-import TranscriptFileSentence from "./TranscriptFileSentence";
+import TranscriptFileSentence from "./TranscriptFileSentence/TranscriptFileSentence";
 import TranscriptFileAddNewSentence from "./TranscriptFileAddNewSentence";
 import moment from "moment";
 
@@ -13,7 +13,7 @@ const textContainerStyle: CSSProperties = {
 }
 
 const TranscriptFileList = () => {
-    const {transcriptFile, isLoading} = rootStore.transcriptStore
+    const {transcriptFile,  isScrollLock} = rootStore.transcriptStore
     const {playHead} = rootStore.audioStore
 
     return (
@@ -33,6 +33,7 @@ const TranscriptFileList = () => {
                                 endTime={moment.duration(sentence.EndTime).asSeconds()}
                                 playHead={playHead}
                                 sIndex={sIndex}
+                                isScrollLock={isScrollLock}
                             />
                             <TranscriptFileAddNewSentence sIndex={sIndex}/>
                         </Card>

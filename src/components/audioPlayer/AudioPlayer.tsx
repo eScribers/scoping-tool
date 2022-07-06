@@ -18,7 +18,6 @@ const AudioPlayer: FC<AudioPlayerProps> = ({src}) => {
 
         audioRef.current.ontimeupdate = () => {
             if (!audioRef.current) return;
-            // console.log(Math.ceil(audioRef.current.currentTime))
             if (Math.ceil(audioStore.playHead) !== Math.ceil(audioRef.current.currentTime)) {
                 audioStore.setPlayHead(audioRef.current.currentTime);
             }

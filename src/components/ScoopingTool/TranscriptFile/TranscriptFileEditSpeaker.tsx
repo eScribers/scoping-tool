@@ -50,10 +50,16 @@ const TranscriptFileEditSpeaker: FC<EditSpeakerInterface> = ({
         </div>
     )
 
+    const handlePlayButton = () => {
+        audioStore.setPlayHead(startTime)
+        audioStore.audioRef?.play()
+    }
+
+
     return (
         <Title level={4}>
             <Space>
-                <Button type='primary' onClick={() => audioStore.setPlayHead(startTime)}>
+                <Button type='primary' onClick={handlePlayButton}>
                     <PlayCircleOutlined/>
                 </Button>
                 <Popover placement="topLeft" title={'Select Speaker Name'} content={SpeakerSelect} trigger="click">
