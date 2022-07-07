@@ -19,6 +19,8 @@ class TranscriptStore {
     forwardsFileId: string = ''
     isScrollLock: boolean = false;
     isLoading: boolean = false;
+    splitText: string = '';
+    splitTextId: number | null = null;
     rootStore: RootStore;
 
     constructor(rootStore: RootStore) {
@@ -56,6 +58,11 @@ class TranscriptStore {
 
     setIsLoading = (v: boolean) => {
         this.isLoading = v
+    }
+
+    setSplitTextParams(text:string, sIndex:number | null){
+        this.splitText = text;
+        this.splitTextId = sIndex;
     }
 
     loadFile(id: string) {

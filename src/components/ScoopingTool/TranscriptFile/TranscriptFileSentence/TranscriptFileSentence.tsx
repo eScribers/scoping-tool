@@ -24,6 +24,7 @@ const TranscriptFileSentence = ({text, startTime, endTime, playHead, isScrollLoc
         setIsInTimeRange(startTime <= playHead && endTime >= playHead)
     }, [playHead])
 
+
     useEffect(() => {
 
         if (isInTimeRange && refSentence.current && !isScrollLock) {
@@ -48,10 +49,17 @@ const TranscriptFileSentence = ({text, startTime, endTime, playHead, isScrollLoc
         transcriptStore.setIsScrollLock(false)
     }
 
+    const handleMouseUp =() => {
+        const selectionText = window.getSelection()?.toString()
+        if(selectionText){
+            transcriptStore.setSplitTextParams(selectionText,sIndex)
+        }
+    }
+
     console.log('render')
 
     return (
-        <div ref={refSentence}>
+        <div ref={refSentence} onMouseUp={handleMouseUp}>
             <Paragraph
                 editable={{
                     onStart: onHandleStart,
@@ -60,6 +68,7 @@ const TranscriptFileSentence = ({text, startTime, endTime, playHead, isScrollLoc
                     enterIcon: null
                 }}
                 className={`sentence-block ${isInTimeRange ? '_current' : null}`}
+
             >
                 {text}
             </Paragraph>
