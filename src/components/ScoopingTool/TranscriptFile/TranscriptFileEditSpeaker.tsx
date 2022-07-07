@@ -52,6 +52,7 @@ const TranscriptFileEditSpeaker: FC<EditSpeakerInterface> = ({
 
     const handlePlayButton = () => {
         audioStore.setPlayHead(startTime)
+        audioStore.setIsPlay(true)
         audioStore.audioRef?.play()
     }
 

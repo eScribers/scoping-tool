@@ -1,16 +1,31 @@
+.sentence-block-highlight{
+  position: relative;
+  &:before{
+    content: '';
+    position: absolute;
+    background: yellow;
+    top: 16px;
+    left: 0;
+    right: 0;
+    bottom: 32px;
+    z-index: 1;
+  }
+}
+
 .sentence-block {
+  padding: 16px 16px 32px;
+  margin: -16px;
+  outline: none;
+  position: relative;
+  z-index: 2;
 
   &._current {
-    .ant-input, & {
-      background: yellow;
-    }
+
   }
 
   .ant-input {
     border-color: transparent;
 
-    &:focus {
-      box-shadow: none;
-    }
+
   }
 }

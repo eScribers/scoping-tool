@@ -19,8 +19,6 @@ class TranscriptStore {
     forwardsFileId: string = ''
     isScrollLock: boolean = false;
     isLoading: boolean = false;
-    splitText: string = '';
-    splitTextId: number | null = null;
     rootStore: RootStore;
 
     constructor(rootStore: RootStore) {
@@ -58,11 +56,6 @@ class TranscriptStore {
 
     setIsLoading = (v: boolean) => {
         this.isLoading = v
-    }
-
-    setSplitTextParams(text:string, sIndex:number | null){
-        this.splitText = text;
-        this.splitTextId = sIndex;
     }
 
     loadFile(id: string) {
@@ -107,12 +100,12 @@ class TranscriptStore {
         }
         axios.post(`https://djrxmzl1ec.execute-api.us-east-1.amazonaws.com/Prod/scoping-tool-api-HelloWorldFunction-57Owtxk448XU/?id=${this.currentFileID}`, newJSON).then((res) => {
             console.log('post request', res)
-            setTimeout(()=>{
+            setTimeout(() => {
                 if (res.status === 201) {
                     this.loadFile(res.data._id)
                 }
                 this.setIsLoading(false)
-            },500)
+            }, 500)
 
         }).catch((error) => {
             console.log('axios error', error)

@@ -14,7 +14,8 @@ const textContainerStyle: CSSProperties = {
 }
 
 const TranscriptFileList = () => {
-    const {transcriptFile, isScrollLock, splitText,splitTextId} = rootStore.transcriptStore
+    const {transcriptFile, isScrollLock} = rootStore.transcriptStore
+    const {splitText,splitTextIndex,splitTextStart, splitTextEnd} = rootStore.splitTextStore
     const {playHead} = rootStore.audioStore
 
     return (
@@ -39,9 +40,10 @@ const TranscriptFileList = () => {
                             <Space>
                                 <TranscriptFileSplitSentence
                                     sIndex={sIndex}
-                                    speakerName={sentence.Speaker}
                                     splitText={splitText}
-                                    splitTextId={splitTextId}
+                                    splitTextIndex={splitTextIndex}
+                                    splitTextStart={splitTextStart}
+                                    splitTextEnd={splitTextEnd}
                                 />
                                 <TranscriptFileAddNewSentence sIndex={sIndex}/>
                             </Space>
