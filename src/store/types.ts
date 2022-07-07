@@ -16,5 +16,5 @@ export interface FileParams {
 }
 
 export interface JSONFileInterface extends FileParams {
-    SimpleSentances: TranscriptFileInterface[]
+    SimpleSentences: TranscriptFileInterface[]
 }

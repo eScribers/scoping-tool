@@ -14,7 +14,7 @@ const TranscriptFile = () => {
     const {isScrollLock, previousFileId, forwardsFileId, currentFileID, isLoading} = transcriptStore
 
     const loadFile = async () => {
-        transcriptStore.loadFile('m1V7yIEBNV5JkCejpNGH')
+        transcriptStore.loadFile('D1UA2YEBNV5JkCejPNLG')
     }
     useEffect(() => {
         loadFile();

@@ -63,7 +63,7 @@ class TranscriptStore {
         axios.get(`https://djrxmzl1ec.execute-api.us-east-1.amazonaws.com/Prod/scoping-tool-api-HelloWorldFunction-57Owtxk448XU/?id=${id}`).then((res) => {
             console.log(res)
             const simpleDoc: JSONFileInterface = res.data.SimpleDoc
-            const allSpeakersName: string[] = simpleDoc.SimpleSentances.map((sentence: TranscriptFileInterface) => sentence.Speaker)
+            const allSpeakersName: string[] = simpleDoc.SimpleSentences.map((sentence: TranscriptFileInterface) => sentence.Speaker)
             const uniqSpeakersName = [...new Set(allSpeakersName)]
 
             this.setSpeakersName(uniqSpeakersName)
@@ -75,7 +75,7 @@ class TranscriptStore {
                 TimeStamp: simpleDoc.TimeStamp
             })
             this.setCurrentFileId(id)
-            this.setTranscriptFile(simpleDoc.SimpleSentances)
+            this.setTranscriptFile(simpleDoc.SimpleSentences)
             if (simpleDoc.ParentDocId !== '' && simpleDoc.ParentDocId.length > 4) {
                 this.setPreviousFileId(simpleDoc.ParentDocId)
             } else {
@@ -95,7 +95,7 @@ class TranscriptStore {
             SimpleDoc: {
                 ...this.fileParams,
                 LastEditor: moment().format('YYYY-MM-DD:HH:MM:SS'),
-                SimpleSentances: data
+                SimpleSentences: data
             }
         }
         axios.post(`https://djrxmzl1ec.execute-api.us-east-1.amazonaws.com/Prod/scoping-tool-api-HelloWorldFunction-57Owtxk448XU/?id=${this.currentFileID}`, newJSON).then((res) => {
