@@ -27,7 +27,7 @@ const TranscriptFileSplitSentence = ({
         return updateData
     }
     const handleSplitCenter = (updateData: TranscriptFileInterface[], middleSentence: TranscriptFileInterface) => {
-        if (!splitTextIndex) return updateData
+        if (splitTextIndex === null) return updateData
 
         const sentencesArray = updateData[splitTextIndex].Text.split(splitText)
         const firstSentence = {...middleSentence, Text: sentencesArray[0]}
@@ -54,8 +54,9 @@ const TranscriptFileSplitSentence = ({
         }
         const defaultTextLength = transcriptStore.transcriptFile[splitTextIndex].Text.trim().length
         let updateData = _.cloneDeep(transcriptStore.transcriptFile)
+
         if (splitTextStart === 0 || splitTextEnd >= defaultTextLength) {
-            updateData[splitTextIndex].Text = updateData[splitTextIndex].Text.replace(splitText, '')
+            updateData[splitTextIndex].Text = transcriptStore.transcriptFile[splitTextIndex].Text.replace(splitText.replace('  ', ' '), '')
         }
 
         if (splitTextStart === 0) {

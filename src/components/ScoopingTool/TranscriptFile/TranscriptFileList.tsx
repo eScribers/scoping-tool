@@ -1,8 +1,8 @@
 import rootStore from "../../../store";
 import {observer} from "mobx-react-lite";
-import {Button, Card, Space} from "antd";
+import { Card, Space} from "antd";
 import {CSSProperties} from "react";
-import { Autosave, useAutosave } from 'react-autosave';
+import { useAutosave} from 'react-autosave';
 import TranscriptFileEditSpeaker from "./TranscriptFileEditSpeaker";
 import TranscriptFileSentence from "./TranscriptFileSentence/TranscriptFileSentence";
 import TranscriptFileAddNewSentence from "./TranscriptFileAddNewSentence";
@@ -21,9 +21,9 @@ const TranscriptFileList = () => {
     const {playHead} = rootStore.audioStore
 
     useAutosave({
-        data:transcriptFile,
+        data: transcriptFile,
         onSave: rootStore.transcriptStore.updateFile,
-        interval: 60000,
+        interval: 60000000,
         saveOnUnmount: false
     })
 

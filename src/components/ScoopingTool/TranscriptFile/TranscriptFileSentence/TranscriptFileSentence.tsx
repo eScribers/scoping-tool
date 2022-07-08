@@ -1,12 +1,9 @@
 import "./TranscriptFileSentence.scss"
-import {Typography} from "antd";
 import {observer} from "mobx-react-lite";
 import rootStore from "../../../../store";
 import React, {useEffect, useState, useRef} from "react";
 import ContentEditable from 'react-contenteditable'
 import _ from "lodash"
-
-const {Paragraph} = Typography
 
 interface SentenceInterface {
     text: string,
@@ -53,19 +50,15 @@ const TranscriptFileSentence = ({text, startTime, endTime, playHead, isScrollLoc
 
     const handleMouseUp = () => {
         const selectionText = window.getSelection()?.toString()
-        let start = window.getSelection()?.getRangeAt(0)?.startOffset
-        let end = window.getSelection()?.getRangeAt(0)?.endOffset
+        let start = window.getSelection()?.getRangeAt(0)?.startOffset || 0
+        let end = window.getSelection()?.getRangeAt(0)?.endOffset || 0
 
-        console.log(selectionText)
-
-        if (selectionText) {
-            splitTextStore.setSplitTextParams({
-                text: selectionText,
-                sIndex: sIndex,
-                start: start ? start : 0,
-                end: end ? end : 0
-            })
-        }
+        splitTextStore.setSplitTextParams({
+            text: selectionText ? selectionText : text.split('', start).join(''),
+            sIndex: sIndex,
+            start: start === end ? 0 : start,
+            end: end
+        })
     }
 
     console.log('render')
@@ -73,6 +66,7 @@ const TranscriptFileSentence = ({text, startTime, endTime, playHead, isScrollLoc
     return (
         <div ref={refSentence} className={`sentence-wrapper ${isInTimeRange ? 'sentence-block-highlight' : ''}`}>
             <ContentEditable
+                onFocus={onHandleStart}
                 onChange={(e) => {
                 }}
                 onBlur={(e) => handleChange(e.target.innerText)}
