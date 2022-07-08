@@ -18,7 +18,7 @@
     "lodash": "^4.17.21",
     "mobx": "^6.6.1",
     "mobx-react-lite": "^3.4.0",
-    "moment": "^2.29.3",
+    "moment": "^2.29.4",
     "react": "^18.0.0",
     "react-autosave": "^0.4.0",
     "react-contenteditable": "^3.3.6",
