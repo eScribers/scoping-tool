@@ -15,8 +15,6 @@ class TranscriptStore {
         TimeStamp: '',
     };
     currentFileID: string = '';
-    previousFileId: string = '';
-    forwardsFileId: string = ''
     isScrollLock: boolean = false;
     isLoading: boolean = false;
     rootStore: RootStore;
@@ -28,6 +26,7 @@ class TranscriptStore {
 
     setTranscriptFile(v: TranscriptFileInterface[]) {
         this.transcriptFile = v
+        this.rootStore.historyStore.updateHistoryDoc(v)
     }
 
     setSpeakersName(v: string[]) {
@@ -44,14 +43,6 @@ class TranscriptStore {
 
     setCurrentFileId = (v: string) => {
         this.currentFileID = v
-    }
-
-    setPreviousFileId = (v: string) => {
-        this.previousFileId = v
-    }
-
-    setForwardFileId = (v: string) => {
-        this.forwardsFileId = v
     }
 
     setIsLoading = (v: boolean) => {
@@ -76,11 +67,7 @@ class TranscriptStore {
             })
             this.setCurrentFileId(id)
             this.setTranscriptFile(simpleDoc.SimpleSentences)
-            if (simpleDoc.ParentDocId !== '' && simpleDoc.ParentDocId.length > 4) {
-                this.setPreviousFileId(simpleDoc.ParentDocId)
-            } else {
-                this.setPreviousFileId('')
-            }
+
             this.setIsLoading(false)
         }).catch((error) => {
             console.log('axios error', error)

@@ -1,7 +1,7 @@
 import rootStore from "../../../store";
 import {observer} from "mobx-react-lite";
 import {Button, Card, Space} from "antd";
-import {CSSProperties} from "react";
+import {CSSProperties, useEffect} from "react";
 import TranscriptFileEditSpeaker from "./TranscriptFileEditSpeaker";
 import TranscriptFileSentence from "./TranscriptFileSentence/TranscriptFileSentence";
 import TranscriptFileAddNewSentence from "./TranscriptFileAddNewSentence";
@@ -15,7 +15,7 @@ const textContainerStyle: CSSProperties = {
 
 const TranscriptFileList = () => {
     const {transcriptFile, isScrollLock} = rootStore.transcriptStore
-    const {splitText,splitTextIndex,splitTextStart, splitTextEnd} = rootStore.splitTextStore
+    const {splitText, splitTextIndex, splitTextStart, splitTextEnd} = rootStore.splitTextStore
     const {playHead} = rootStore.audioStore
 
     return (

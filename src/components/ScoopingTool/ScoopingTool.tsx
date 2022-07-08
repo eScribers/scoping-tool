@@ -8,8 +8,8 @@ const ScoopingTool = () => {
 
     return (
         <>
-            <AudioPlayer src="/audioFiles/test.mp3" />
-            <TranscriptFile />
+            <AudioPlayer src="/audioFiles/test.mp3"/>
+            <TranscriptFile/>
         </>
     )
 }

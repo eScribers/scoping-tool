@@ -6,12 +6,13 @@ import DownloadPDF from "../ScoopingButtons/DownloadPDF";
 import rootStore from "../../../store";
 import {observer} from "mobx-react-lite";
 import TranscriptFileList from "./TranscriptFileList";
+import TranscriptFileVersionControl from "./TranscriptFileVersionControl";
 
 const {Text} = Typography
 
 const TranscriptFile = () => {
     const {transcriptStore} = rootStore
-    const {isScrollLock, previousFileId, forwardsFileId, currentFileID, isLoading} = transcriptStore
+    const {isScrollLock, currentFileID} = transcriptStore
 
     const loadFile = async () => {
         transcriptStore.loadFile('D1UA2YEBNV5JkCejPNLG')
@@ -20,15 +21,6 @@ const TranscriptFile = () => {
         loadFile();
     }, []);
 
-    const handlePreviousClick = () => {
-        transcriptStore.setForwardFileId(currentFileID)
-        transcriptStore.loadFile(previousFileId)
-    }
-
-    const handleNextClick = () => {
-        transcriptStore.setForwardFileId('')
-        transcriptStore.loadFile(forwardsFileId)
-    }
 
     if (!transcriptStore.transcriptFile.length) return null;
 
@@ -50,30 +42,7 @@ const TranscriptFile = () => {
                 </Space>
             </Card>
             <Divider/>
-            <Card>
-                <Space
-                    style={{
-                        width: '100%',
-                    }}
-                >
-                    <Button
-                        type='primary'
-                        onClick={handlePreviousClick}
-                        disabled={previousFileId === '' || isLoading}
-                        loading={isLoading}
-                    >
-                        Preview Version
-                    </Button>
-                    <Button
-                        type='primary'
-                        onClick={handleNextClick}
-                        disabled={forwardsFileId === '' || isLoading}
-                        loading={isLoading}
-                    >
-                        Next Version
-                    </Button>
-                </Space>
-            </Card>
+            <TranscriptFileVersionControl/>
             <TranscriptFileList/>
         </>
     )

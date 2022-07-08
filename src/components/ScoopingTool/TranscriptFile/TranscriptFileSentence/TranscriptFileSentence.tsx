@@ -85,8 +85,9 @@ const TranscriptFileSentence = ({text, startTime, endTime, playHead, isScrollLoc
             {/*    {text}*/}
             {/*</Paragraph>*/}
             <ContentEditable
-                onChange={(e)=>{}}
-                onBlur={(e)=>handleChange(e.target.innerText)}
+                onChange={(e) => {
+                }}
+                onBlur={(e) => handleChange(e.target.innerText)}
                 className={`sentence-block`}
                 html={text}
                 onMouseUp={handleMouseUp}

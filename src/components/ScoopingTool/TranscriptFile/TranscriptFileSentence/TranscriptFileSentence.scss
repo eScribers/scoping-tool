@@ -1,6 +1,7 @@
-.sentence-block-highlight{
+.sentence-block-highlight {
   position: relative;
-  &:before{
+
+  &:before {
     content: '';
     position: absolute;
     background: yellow;
