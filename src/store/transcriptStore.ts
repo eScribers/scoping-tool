@@ -3,9 +3,11 @@ import {RootStore} from "./index";
 import axios from "axios";
 import {TranscriptFileInterface, JSONFileInterface, FileParams} from "./types";
 import moment from "moment";
+import _ from "lodash"
 
 class TranscriptStore {
     transcriptFile: TranscriptFileInterface[] = [];
+    transcriptDocs: JSONFileInterface[] = [];
     speakersName: string[] = [];
     fileParams: FileParams = {
         IsCompleted: false,
@@ -29,6 +31,12 @@ class TranscriptStore {
         this.rootStore.historyStore.updateHistoryDoc(v)
     }
 
+    setTranscriptDocs = (transcriptDoc: JSONFileInterface) => {
+        const updateDocs = _.cloneDeep(this.transcriptDocs)
+        updateDocs.push(transcriptDoc)
+        this.transcriptDocs = updateDocs
+    }
+
     setSpeakersName(v: string[]) {
         this.speakersName = v
     }
@@ -49,10 +57,10 @@ class TranscriptStore {
         this.isLoading = v
     }
 
-    loadFile(id: string) {
+    loadFile = (id: string) => {
         this.setIsLoading(true)
         axios.get(`https://djrxmzl1ec.execute-api.us-east-1.amazonaws.com/Prod/scoping-tool-api-HelloWorldFunction-57Owtxk448XU/?id=${id}`).then((res) => {
-            console.log(res)
+            console.log('get response', res)
             const simpleDoc: JSONFileInterface = res.data.SimpleDoc
             const allSpeakersName: string[] = simpleDoc.SimpleSentences.map((sentence: TranscriptFileInterface) => sentence.Speaker)
             const uniqSpeakersName = [...new Set(allSpeakersName)]
@@ -67,7 +75,7 @@ class TranscriptStore {
             })
             this.setCurrentFileId(id)
             this.setTranscriptFile(simpleDoc.SimpleSentences)
-
+            this.setTranscriptDocs(simpleDoc)
             this.setIsLoading(false)
         }).catch((error) => {
             console.log('axios error', error)
@@ -75,7 +83,7 @@ class TranscriptStore {
         })
     }
 
-    updateFile(data: TranscriptFileInterface[]) {
+    updateFile = (data: TranscriptFileInterface[]) => {
         this.setIsLoading(true)
 
         const newJSON = {
@@ -99,6 +107,7 @@ class TranscriptStore {
             this.setIsLoading(false)
         })
     }
+
 }
 
 export default TranscriptStore

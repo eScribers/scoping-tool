@@ -44,7 +44,7 @@ const TranscriptFileAddNewSentence = ({sIndex}: AddNewSentenceInterface) => {
             EndTime: moment(v.endTime).format(formatTime)
         }
         copyTranscriptFile.splice(sIndex + 1, 0, item)
-        transcriptStore.updateFile(copyTranscriptFile)
+        transcriptStore.setTranscriptFile(copyTranscriptFile)
     }
 
     useEffect(() => {

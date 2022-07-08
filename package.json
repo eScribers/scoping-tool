@@ -20,6 +20,7 @@
     "mobx-react-lite": "^3.4.0",
     "moment": "^2.29.3",
     "react": "^18.0.0",
+    "react-autosave": "^0.4.0",
     "react-contenteditable": "^3.3.6",
     "react-dom": "^18.0.0",
     "sass": "^1.52.3"

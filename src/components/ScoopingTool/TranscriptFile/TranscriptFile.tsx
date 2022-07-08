@@ -8,11 +8,12 @@ import {observer} from "mobx-react-lite";
 import TranscriptFileList from "./TranscriptFileList";
 import TranscriptFileVersionControl from "./TranscriptFileVersionControl";
 
+
 const {Text} = Typography
 
 const TranscriptFile = () => {
     const {transcriptStore} = rootStore
-    const {isScrollLock, currentFileID} = transcriptStore
+    const {isScrollLock} = transcriptStore
 
     const loadFile = async () => {
         transcriptStore.loadFile('D1UA2YEBNV5JkCejPNLG')
@@ -20,7 +21,6 @@ const TranscriptFile = () => {
     useEffect(() => {
         loadFile();
     }, []);
-
 
     if (!transcriptStore.transcriptFile.length) return null;
 

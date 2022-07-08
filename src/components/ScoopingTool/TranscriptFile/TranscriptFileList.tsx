@@ -1,7 +1,8 @@
 import rootStore from "../../../store";
 import {observer} from "mobx-react-lite";
 import {Button, Card, Space} from "antd";
-import {CSSProperties, useEffect} from "react";
+import {CSSProperties} from "react";
+import { Autosave, useAutosave } from 'react-autosave';
 import TranscriptFileEditSpeaker from "./TranscriptFileEditSpeaker";
 import TranscriptFileSentence from "./TranscriptFileSentence/TranscriptFileSentence";
 import TranscriptFileAddNewSentence from "./TranscriptFileAddNewSentence";
@@ -17,6 +18,13 @@ const TranscriptFileList = () => {
     const {transcriptFile, isScrollLock} = rootStore.transcriptStore
     const {splitText, splitTextIndex, splitTextStart, splitTextEnd} = rootStore.splitTextStore
     const {playHead} = rootStore.audioStore
+
+    useAutosave({
+        data:transcriptFile,
+        onSave: rootStore.transcriptStore.updateFile,
+        interval: 60000,
+        saveOnUnmount: false
+    })
 
     return (
         <div style={textContainerStyle}>

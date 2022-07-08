@@ -72,18 +72,6 @@ const TranscriptFileSentence = ({text, startTime, endTime, playHead, isScrollLoc
 
     return (
         <div ref={refSentence} className={isInTimeRange ? 'sentence-block-highlight' : ''}>
-            {/*<Paragraph*/}
-            {/*    editable={{*/}
-            {/*        onStart: onHandleStart,*/}
-            {/*        onChange: handleChange,*/}
-            {/*        triggerType: ['text'],*/}
-            {/*        enterIcon: null*/}
-            {/*    }}*/}
-            {/*    className={`sentence-block ${isInTimeRange ? '_current' : null}`}*/}
-
-            {/*>*/}
-            {/*    {text}*/}
-            {/*</Paragraph>*/}
             <ContentEditable
                 onChange={(e) => {
                 }}
