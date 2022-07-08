@@ -7,6 +7,7 @@ import TranscriptFileEditSpeaker from "./TranscriptFileEditSpeaker";
 import TranscriptFileSentence from "./TranscriptFileSentence/TranscriptFileSentence";
 import TranscriptFileAddNewSentence from "./TranscriptFileAddNewSentence";
 import TranscriptFileSplitSentence from "./TranscriptFileSplitSentence";
+import TranscriptFileDeleteSentence from "./TranscriptFileDeleteSentence";
 import moment from "moment";
 
 const textContainerStyle: CSSProperties = {
@@ -54,6 +55,7 @@ const TranscriptFileList = () => {
                                     splitTextEnd={splitTextEnd}
                                 />
                                 <TranscriptFileAddNewSentence sIndex={sIndex}/>
+                                <TranscriptFileDeleteSentence sIndex={sIndex}/>
                             </Space>
                         </Card>
 

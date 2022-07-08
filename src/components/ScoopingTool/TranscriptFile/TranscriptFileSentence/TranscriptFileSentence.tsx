@@ -71,7 +71,7 @@ const TranscriptFileSentence = ({text, startTime, endTime, playHead, isScrollLoc
     console.log('render')
 
     return (
-        <div ref={refSentence} className={isInTimeRange ? 'sentence-block-highlight' : ''}>
+        <div ref={refSentence} className={`sentence-wrapper ${isInTimeRange ? 'sentence-block-highlight' : ''}`}>
             <ContentEditable
                 onChange={(e) => {
                 }}

@@ -1,5 +1,13 @@
-.sentence-block-highlight {
+.sentence-wrapper {
   position: relative;
+
+  & + * {
+    position: relative;
+    z-index: 2;
+  }
+}
+
+.sentence-block-highlight {
 
   &:before {
     content: '';
