@@ -59,9 +59,14 @@ class TranscriptStore {
 
     loadFile = (id: string) => {
         this.setIsLoading(true)
-        axios.get(`https://djrxmzl1ec.execute-api.us-east-1.amazonaws.com/Prod/scoping-tool-api-HelloWorldFunction-57Owtxk448XU/?id=${id}`).then((res) => {
+        axios.get(`https://search-myscopingtooldomain-a5n4jhnv7oi7lfbvflh42ly2hu.us-east-1.es.amazonaws.com/docs/_doc/_search`,{
+            auth: {
+                username: 'admin',
+                password: 'Test#123'
+            }
+        }).then((res) => {
             console.log('get response', res)
-            const simpleDoc: JSONFileInterface = res.data.SimpleDoc
+            const simpleDoc: JSONFileInterface = res.data.hits.hits[0]._source.SimpleDoc
             const allSpeakersName: string[] = simpleDoc.SimpleSentences.map((sentence: TranscriptFileInterface) => sentence.Speaker)
             const uniqSpeakersName = [...new Set(allSpeakersName)]
 

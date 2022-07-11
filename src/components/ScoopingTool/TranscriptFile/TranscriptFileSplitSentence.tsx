@@ -56,7 +56,8 @@ const TranscriptFileSplitSentence = ({
         let updateData = _.cloneDeep(transcriptStore.transcriptFile)
 
         if (splitTextStart === 0 || splitTextEnd >= defaultTextLength) {
-            updateData[splitTextIndex].Text = transcriptStore.transcriptFile[splitTextIndex].Text.replace(splitText.replace('  ', ' '), '')
+            //.replace need to avoid the problem with two spaces
+            updateData[splitTextIndex].Text = transcriptStore.transcriptFile[splitTextIndex].Text.replace(splitText.replace(/  +/g, ' '), '')
         }
 
         if (splitTextStart === 0) {
