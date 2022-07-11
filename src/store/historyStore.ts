@@ -3,7 +3,7 @@ import {makeAutoObservable} from "mobx";
 import {TranscriptFileInterface} from "./types";
 
 class HistoryStore {
-    historyDocs: any[] = [];
+    historyDocs: Array<Array<TranscriptFileInterface>> = [];
     currentVersion: number = 0;
     rootStore: RootStore;
 
